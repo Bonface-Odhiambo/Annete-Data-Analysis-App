@@ -36,18 +36,42 @@ BORDER = "#1E2E47"
 TEXT   = "#E2EAF4"
 MUTED  = "#6B7E99"
 
+# NOTE: PLOTLY_LAYOUT intentionally does NOT include xaxis, yaxis, or legend
+# so that pages can pass those freely without "multiple values" errors.
 PLOTLY_LAYOUT = dict(
-    paper_bgcolor=BG, plot_bgcolor=SURF,
+    paper_bgcolor=BG,
+    plot_bgcolor=SURF,
     font=dict(color=TEXT, family="Space Mono, monospace", size=11),
-    xaxis=dict(gridcolor=BORDER, color=MUTED, linecolor=BORDER),
     margin=dict(l=40, r=20, t=40, b=40),
-    legend=dict(bgcolor="rgba(0,0,0,0)", bordercolor=BORDER, font=dict(color=MUTED)),
 )
 
-def apply_layout(fig, title="", height=350):
-    fig.update_layout(**PLOTLY_LAYOUT, title=dict(text=title, font=dict(color=TEXT, size=13)),
-                      height=height)
+AXIS_STYLE = dict(gridcolor=BORDER, color=MUTED, linecolor=BORDER)
+
+
+def apply_layout(fig, title="", height=350, **extra):
+    """
+    Apply standard theme to a figure.
+    Pass any additional update_layout kwargs via **extra —
+    they are merged safely so there are no duplicate-key errors.
+    """
+    layout = dict(
+        **PLOTLY_LAYOUT,
+        title=dict(text=title, font=dict(color=TEXT, size=13)),
+        height=height,
+        legend=dict(bgcolor="rgba(0,0,0,0)", bordercolor=BORDER, font=dict(color=MUTED)),
+    )
+    layout.update(extra)          # caller overrides win cleanly
+    fig.update_layout(**layout)
+    fig.update_xaxes(**AXIS_STYLE)
+    fig.update_yaxes(**AXIS_STYLE)
     return fig
+
+
+def hex_alpha(hex_color, alpha=0.7):
+    """Convert #RRGGBB to rgba(r,g,b,alpha) — Plotly 6.x compatible."""
+    h = hex_color.lstrip("#")
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{alpha})"
 
 # ── Data loading ───────────────────────────────────────────────────────────
 DATA_FILE = "Fleet_Fuel_Cleaned_Dataset_v4.xlsx"
