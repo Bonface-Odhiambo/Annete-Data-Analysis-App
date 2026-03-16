@@ -41,9 +41,11 @@ st.markdown("""
 
 /* ── Sidebar ── */
 section[data-testid="stSidebar"] {
-  background: linear-gradient(180deg, #0A1120 0%, #0D1828 60%, #091016 100%);
+  background: linear-gradient(180deg, #1a2332 0%, #1f2937 60%, #1a1f2e 100%);
   border-right: 1px solid var(--border);
   min-width: 260px !important;
+  z-index: 9999 !important;
+  position: relative !important;
 }
 section[data-testid="stSidebar"] > div { padding: 0 !important; }
 
@@ -406,7 +408,7 @@ with st.sidebar:
         ("🔬", "ic-purple", "EDA Figures",        "NB1 outputs",    "3"),
         ("🤖", "ic-amber",  "ML Models",          "R²=0.9212",      "4"),
         ("🚗", "ic-red",    "Vehicles",           "VEH-xxx scores", "5"),
-        ("🗺", "ic-cyan",   "Routes",             "Route analysis", "6"),
+        ("🗺️", "ic-cyan",   "Routes",             "Route analysis", "6"),
         ("🚀", "ic-green",  "Deployment",         "Savings",        "7"),
     ]
 
@@ -543,7 +545,7 @@ st.markdown("""
     <div class="feat-card-desc">Per-vehicle efficiency scores, grades A–D, and cost breakdown. VEH-xxx anonymised.</div>
   </div>
   <div class="feat-card">
-    <span class="feat-card-icon">🗺</span>
+    <span class="feat-card-icon">🗺️</span>
     <div class="feat-card-title">Routes</div>
     <div class="feat-card-desc">Route-level efficiency scoring and consistency analysis across all vehicle types.</div>
   </div>
