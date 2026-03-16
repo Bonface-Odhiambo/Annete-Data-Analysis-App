@@ -378,6 +378,52 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 }
 .cta-text strong { color: var(--accent); }
 
+/* ── Streamlit page navigation styling ── */
+[data-testid="stSidebarNav"] {
+  background: rgba(26, 35, 50, 0.6) !important;
+  border-radius: 8px !important;
+  margin: 0.5rem !important;
+  padding: 0.5rem !important;
+  border: 1px solid rgba(0, 229, 160, 0.2) !important;
+}
+
+[data-testid="stSidebarNav"] a {
+  background: rgba(0, 229, 160, 0.1) !important;
+  border-radius: 6px !important;
+  margin: 0.2rem 0 !important;
+  padding: 0.6rem 0.8rem !important;
+  border: 1px solid rgba(0, 229, 160, 0.15) !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-testid="stSidebarNav"] a:hover {
+  background: rgba(0, 229, 160, 0.2) !important;
+  border-color: rgba(0, 229, 160, 0.3) !important;
+  transform: translateX(2px) !important;
+}
+
+[data-testid="stSidebarNav"] [data-testid="stSidebarNavLink"] {
+  color: #E8F0FF !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+}
+
+[data-testid="stSidebarNav"] [data-testid="stSidebarNavLink"]:hover {
+  color: #00E5A0 !important;
+}
+
+/* Make icons brighter and larger */
+[data-testid="stSidebarNav"] span[class*="icon"] {
+  font-size: 1.2rem !important;
+  filter: brightness(1.3) !important;
+}
+
+/* Active page styling */
+[data-testid="stSidebarNav"] a[href*="/"] {
+  background: rgba(0, 229, 160, 0.25) !important;
+  border-color: rgba(0, 229, 160, 0.4) !important;
+}
+
 /* ── Streamlit overrides ── */
 h1, h2, h3 { font-family: 'Syne', sans-serif !important; }
 .stMetric label { font-family: 'JetBrains Mono', monospace !important; font-size: .6rem !important; }
