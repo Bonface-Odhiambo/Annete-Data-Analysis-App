@@ -106,11 +106,12 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
   border-color: rgba(0,229,160,.18);
 }
 .sb-nav-icon {
-  width: 32px; height: 32px;
+  width: 36px; height: 36px;
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
+  font-size: 1.2rem;
   flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 .sb-nav-text { font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 500; color: var(--text); }
 .sb-nav-badge {
@@ -125,13 +126,13 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 }
 
 /* Icon background colours */
-.ic-teal    { background: rgba(0,229,160,.15); }
-.ic-blue    { background: rgba(0,184,255,.15); }
-.ic-amber   { background: rgba(255,184,48,.15); }
-.ic-red     { background: rgba(255,61,107,.15); }
-.ic-purple  { background: rgba(176,110,255,.15); }
-.ic-green   { background: rgba(52,211,153,.15); }
-.ic-cyan    { background: rgba(34,211,238,.15); }
+.ic-teal    { background: rgba(0,229,160,.25); }
+.ic-blue    { background: rgba(0,184,255,.25); }
+.ic-amber   { background: rgba(255,184,48,.25); }
+.ic-red     { background: rgba(255,61,107,.25); }
+.ic-purple  { background: rgba(176,110,255,.25); }
+.ic-green   { background: rgba(52,211,153,.25); }
+.ic-cyan    { background: rgba(34,211,238,.25); }
 
 /* ── Sidebar author card ── */
 .sb-author {
@@ -403,13 +404,13 @@ with st.sidebar:
 
     # Nav items — Streamlit auto-generates page links; we style the sidebar context
     nav_items = [
-        ("📊", "ic-teal",   "Overview & KPIs",    "KPI summary",    "1"),
+        ("�", "ic-teal",   "Overview & KPIs",    "KPI summary",    "1"),
         ("📈", "ic-blue",   "Trends",             "Time series",    "2"),
-        ("🔬", "ic-purple", "EDA Figures",        "NB1 outputs",    "3"),
-        ("🤖", "ic-amber",  "ML Models",          "R²=0.9212",      "4"),
-        ("🚗", "ic-red",    "Vehicles",           "VEH-xxx scores", "5"),
+        ("🔎", "ic-purple", "EDA Figures",        "NB1 outputs",    "3"),
+        ("🧠", "ic-amber",  "ML Models",          "R²=0.9212",      "4"),
+        ("🚐", "ic-red",    "Vehicles",           "VEH-xxx scores", "5"),
         ("🗺️", "ic-cyan",   "Routes",             "Route analysis", "6"),
-        ("🚀", "ic-green",  "Deployment",         "Savings",        "7"),
+        ("🎯", "ic-green",  "Deployment",         "Savings",        "7"),
     ]
 
     for icon, ic_cls, label, badge, _ in nav_items:
@@ -520,7 +521,7 @@ st.markdown("""
 st.markdown("""
 <div class="feat-grid">
   <div class="feat-card">
-    <span class="feat-card-icon">📊</span>
+    <span class="feat-card-icon">�</span>
     <div class="feat-card-title">Overview & KPIs</div>
     <div class="feat-card-desc">Fleet-wide spend, efficiency and EFC compliance across 32,772 records.</div>
   </div>
@@ -530,17 +531,17 @@ st.markdown("""
     <div class="feat-card-desc">Monthly cost trends, 3-month MA, MoM change and litres-per-trip over time.</div>
   </div>
   <div class="feat-card">
-    <span class="feat-card-icon">🔬</span>
+    <span class="feat-card-icon">🔎</span>
     <div class="feat-card-title">EDA Figures</div>
     <div class="feat-card-desc">All Notebook 1 outputs — univariate, vehicle types, correlations, EFC benchmarks.</div>
   </div>
   <div class="feat-card">
-    <span class="feat-card-icon">🤖</span>
+    <span class="feat-card-icon">🧠</span>
     <div class="feat-card-title">ML Models</div>
     <div class="feat-card-desc">4 models (Ridge, RF, GBM, MLP) trained on 31,250 rows. Champion: GBM R²=0.9212.</div>
   </div>
   <div class="feat-card">
-    <span class="feat-card-icon">🚗</span>
+    <span class="feat-card-icon">🚐</span>
     <div class="feat-card-title">Vehicles</div>
     <div class="feat-card-desc">Per-vehicle efficiency scores, grades A–D, and cost breakdown. VEH-xxx anonymised.</div>
   </div>
@@ -550,7 +551,7 @@ st.markdown("""
     <div class="feat-card-desc">Route-level efficiency scoring and consistency analysis across all vehicle types.</div>
   </div>
   <div class="feat-card">
-    <span class="feat-card-icon">🚀</span>
+    <span class="feat-card-icon">🎯</span>
     <div class="feat-card-title">Deployment</div>
     <div class="feat-card-desc">Savings potential, vehicles below benchmark, monthly and annual KES recovery estimates.</div>
   </div>
