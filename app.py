@@ -20,19 +20,19 @@ st.markdown("""
 
 /* ── Root variables ── */
 :root {
-  --bg:       #080D18;
-  --surf:     #0F1829;
-  --surf2:    #162035;
-  --border:   #1C2D47;
-  --border2:  #243552;
-  --accent:   #00E5A0;
-  --accent2:  #00B8FF;
-  --amber:    #FFB830;
+  --bg:       #0C4A6E;
+  --surf:     #0E4F71;
+  --surf2:    #115377;
+  --border:   #155A80;
+  --border2:  #1A6189;
+  --accent:   #22D3EE;
+  --accent2:  #0EA5E9;
+  --amber:    #F59E0B;
   --red:      #FF3D6B;
   --purple:   #B06EFF;
   --text:     #E8F0FF;
-  --muted:    #5A7299;
-  --muted2:   #8A9BBB;
+  --muted:    #94A3B8;
+  --muted2:   #CBD5E1;
 }
 
 /* ── Global ── */
@@ -41,7 +41,7 @@ st.markdown("""
 
 /* ── Sidebar ── */
 section[data-testid="stSidebar"] {
-  background: linear-gradient(180deg, #1a2332 0%, #1f2937 60%, #1a1f2e 100%);
+  background: linear-gradient(180deg, #0D4A6E 0%, #0E5A80 60%, #0C3D5C 100%);
   border-right: 1px solid var(--border);
   min-width: 260px !important;
   z-index: 9999 !important;
@@ -53,7 +53,7 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 .sb-brand {
   padding: 1.4rem 1.2rem 1rem;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(135deg, rgba(0,229,160,.06) 0%, rgba(0,184,255,.04) 100%);
+  background: linear-gradient(135deg, rgba(34,211,238,.06) 0%, rgba(14,165,233,.04) 100%);
 }
 .sb-brand-icon {
   font-size: 2rem;
@@ -102,8 +102,8 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
   text-decoration: none;
 }
 .sb-nav-item:hover {
-  background: rgba(0,229,160,.06);
-  border-color: rgba(0,229,160,.18);
+  background: rgba(34,211,238,.06);
+  border-color: rgba(34,211,238,.18);
 }
 .sb-nav-icon {
   width: 36px; height: 36px;
@@ -126,9 +126,9 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 }
 
 /* Icon background colours */
-.ic-teal    { background: rgba(0,229,160,.25); }
-.ic-blue    { background: rgba(0,184,255,.25); }
-.ic-amber   { background: rgba(255,184,48,.25); }
+.ic-teal    { background: rgba(34,211,238,.25); }
+.ic-blue    { background: rgba(14,165,233,.25); }
+.ic-amber   { background: rgba(245,158,11,.25); }
 .ic-red     { background: rgba(255,61,107,.25); }
 .ic-purple  { background: rgba(176,110,255,.25); }
 .ic-green   { background: rgba(52,211,153,.25); }
@@ -160,8 +160,8 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 .sb-privacy {
   margin: .5rem .5rem .8rem;
   padding: .5rem 1rem;
-  background: rgba(0,229,160,.04);
-  border: 1px solid rgba(0,229,160,.2);
+  background: rgba(34,211,238,.04);
+  border: 1px solid rgba(34,211,238,.2);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -178,7 +178,7 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 
 /* ── Home page hero ── */
 .hero-wrap {
-  background: linear-gradient(135deg, rgba(0,229,160,.05) 0%, rgba(0,184,255,.04) 50%, rgba(176,110,255,.03) 100%);
+  background: linear-gradient(135deg, rgba(34,211,238,.05) 0%, rgba(14,165,233,.04) 50%, rgba(176,110,255,.03) 100%);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 2.5rem 2.8rem;
@@ -192,7 +192,7 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
   top: -60px; right: -60px;
   width: 260px; height: 260px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,229,160,.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(34,211,238,.08) 0%, transparent 70%);
   pointer-events: none;
 }
 .hero-eyebrow {
@@ -362,8 +362,8 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 
 /* ── Call to action bar ── */
 .cta-bar {
-  background: linear-gradient(90deg, rgba(0,229,160,.08) 0%, rgba(0,184,255,.06) 100%);
-  border: 1px solid rgba(0,229,160,.2);
+  background: linear-gradient(90deg, rgba(34,211,238,.08) 0%, rgba(14,165,233,.06) 100%);
+  border: 1px solid rgba(34,211,238,.2);
   border-radius: 10px;
   padding: .9rem 1.4rem;
   display: flex;
@@ -380,25 +380,25 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 
 /* ── Streamlit page navigation styling ── */
 [data-testid="stSidebarNav"] {
-  background: rgba(26, 35, 50, 0.6) !important;
+  background: rgba(12, 74, 110, 0.6) !important;
   border-radius: 8px !important;
   margin: 0.5rem !important;
   padding: 0.5rem !important;
-  border: 1px solid rgba(0, 229, 160, 0.2) !important;
+  border: 1px solid rgba(34, 211, 238, 0.2) !important;
 }
 
 [data-testid="stSidebarNav"] a {
-  background: rgba(0, 229, 160, 0.1) !important;
+  background: rgba(34, 211, 238, 0.1) !important;
   border-radius: 6px !important;
   margin: 0.2rem 0 !important;
   padding: 0.6rem 0.8rem !important;
-  border: 1px solid rgba(0, 229, 160, 0.15) !important;
+  border: 1px solid rgba(34, 211, 238, 0.15) !important;
   transition: all 0.2s ease !important;
 }
 
 [data-testid="stSidebarNav"] a:hover {
-  background: rgba(0, 229, 160, 0.2) !important;
-  border-color: rgba(0, 229, 160, 0.3) !important;
+  background: rgba(34, 211, 238, 0.2) !important;
+  border-color: rgba(34, 211, 238, 0.3) !important;
   transform: translateX(2px) !important;
 }
 
@@ -409,7 +409,7 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 }
 
 [data-testid="stSidebarNav"] [data-testid="stSidebarNavLink"]:hover {
-  color: #00E5A0 !important;
+  color: #22D3EE !important;
 }
 
 /* Make icons brighter and larger */
@@ -420,8 +420,8 @@ section[data-testid="stSidebar"] > div { padding: 0 !important; }
 
 /* Active page styling */
 [data-testid="stSidebarNav"] a[href*="/"] {
-  background: rgba(0, 229, 160, 0.25) !important;
-  border-color: rgba(0, 229, 160, 0.4) !important;
+  background: rgba(34, 211, 238, 0.25) !important;
+  border-color: rgba(34, 211, 238, 0.4) !important;
 }
 
 /* ── Streamlit overrides ── */
