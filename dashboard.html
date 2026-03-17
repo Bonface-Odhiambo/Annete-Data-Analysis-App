@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Fuel Intelligence Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg: #0B0914;
+            --surf: #130D20;
+            --surf2: #1A1230;
+            --border: #2A1D45;
+            --border2: #3A2860;
+            --v1: #A78BFA;
+            --v2: #7C3AED;
+            --teal: #2DD4BF;
+            --pink: #F472B6;
+            --amber: #FCD34D;
+            --red: #F87171;
+            --sky: #38BDF8;
+            --green: #34D399;
+            --text: #EDE9FE;
+            --muted: #6D5FA0;
+            --muted2: #A99BC8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg,#0D0A1C 0%,#110E24 50%,#0A0816 100%);
+            border-right: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sb-brand {
+            padding: 1.5rem 1.2rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg,rgba(167,139,250,.07) 0%,rgba(45,212,191,.04) 100%);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .sb-logo {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: linear-gradient(135deg,#7C3AED,#2DD4BF);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; margin-bottom: .7rem;
+        }
+
+        .sb-brand-title {
+            font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:800;
+            color:var(--text); letter-spacing:-.01em; line-height:1.2;
+        }
+
+        .sb-brand-sub {
+            font-family:'JetBrains Mono',monospace; font-size:.58rem;
+            color:var(--teal); letter-spacing:.12em; text-transform:uppercase; margin-top:.35rem;
+        }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; margin: 4px 0;
+            border-radius: 10px; border: 1px solid transparent;
+            transition: all 0.2s; cursor: pointer;
+            text-decoration: none; color: var(--text);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.22);
+        }
+
+        .nav-icon {
+            width: 34px; height: 34px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:500; }
+        .nav-badge {
+            margin-left: auto;
+            font-family:'JetBrains Mono',monospace; font-size:.53rem;
+            color:var(--muted); background:var(--surf2);
+            border:1px solid var(--border); padding:.1rem .38rem; border-radius:5px;
+        }
+
+        .hero-wrap {
+            background: linear-gradient(135deg,rgba(124,58,237,.08) 0%,rgba(45,212,191,.05) 50%,rgba(244,114,182,.04) 100%);
+            border:1px solid var(--border); border-radius:18px;
+            padding:2.6rem 3rem; position:relative; overflow:hidden;
+        }
+
+        .hero-title {
+            font-family:'Syne',sans-serif; font-size:2.1rem; font-weight:800;
+            color:var(--text); line-height:1.16; letter-spacing:-.03em; margin-bottom: 1rem;
+        }
+
+        .hero-sub {
+            font-family:'Inter',sans-serif; font-size:.9rem;
+            color:var(--muted2); line-height:1.65; max-width:620px; margin-bottom:1.3rem;
+        }
+
+        .stat-row { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.4rem; }
+        .stat-pill {
+            flex:1; min-width:125px; background:var(--surf);
+            border:1px solid var(--border); border-radius:14px;
+            padding:1.1rem 1.2rem; position:relative; overflow:hidden;
+        }
+        .stat-pill-val {
+            font-family:'Syne',sans-serif; font-size:1.55rem; font-weight:800;
+            line-height:1; letter-spacing:-.03em; margin-bottom:.28rem;
+        }
+        .stat-pill-label { font-family:'Inter',sans-serif; font-size:.72rem; color:var(--muted2); font-weight:500; }
+        .stat-pill-sub { font-family:'JetBrains Mono',monospace; font-size:.54rem; color:var(--muted); margin-top:.2rem; }
+
+        .sp-t .stat-pill-val { color:var(--teal); }
+        .sp-v .stat-pill-val { color:var(--v1); }
+        .sp-a .stat-pill-val { color:var(--amber); }
+        .sp-r .stat-pill-val { color:var(--red); }
+        .sp-p .stat-pill-val { color:var(--pink); }
+
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+
+        .card {
+            background: var(--surf);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .plot-container { height: 400px; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sb-brand">
+                <div class="sb-logo">⛽</div>
+                <div class="sb-brand-title">Fleet Fuel<br>Intelligence</div>
+                <div class="sb-brand-sub">MSc · Strathmore University</div>
+            </div>
+
+            <div class="nav-section">
+                <a href="#" class="nav-item active" data-page="overview">
+                    <div class="nav-icon" style="background:rgba(45,212,191,.15)">📊</div>
+                    <span class="nav-text">Overview & KPIs</span>
+                    <span class="nav-badge">KPIs</span>
+                </a>
+                <a href="#" class="nav-item" data-page="trends">
+                    <div class="nav-icon" style="background:rgba(56,189,248,.15)">📈</div>
+                    <span class="nav-text">Trends</span>
+                    <span class="nav-badge">Time</span>
+                </a>
+                <a href="#" class="nav-item" data-page="eda">
+                    <div class="nav-icon" style="background:rgba(167,139,250,.15)">🔬</div>
+                    <span class="nav-text">EDA Figures</span>
+                    <span class="nav-badge">NB1</span>
+                </a>
+                <a href="#" class="nav-item" data-page="ml">
+                    <div class="nav-icon" style="background:rgba(252,211,77,.15)">🤖</div>
+                    <span class="nav-text">ML Models</span>
+                    <span class="nav-badge">R²=0.9212</span>
+                </a>
+                <a href="#" class="nav-item" data-page="vehicles">
+                    <div class="nav-icon" style="background:rgba(244,114,182,.15)">🚗</div>
+                    <span class="nav-text">Vehicles</span>
+                    <span class="nav-badge">VEH-xxx</span>
+                </a>
+                <a href="#" class="nav-item" data-page="routes">
+                    <div class="nav-icon" style="background:rgba(52,211,153,.15)">🗺</div>
+                    <span class="nav-text">Routes</span>
+                    <span class="nav-badge">Analysis</span>
+                </a>
+                <a href="#" class="nav-item" data-page="deployment">
+                    <div class="nav-icon" style="background:rgba(248,113,113,.15)">🚀</div>
+                    <span class="nav-text">Deployment</span>
+                    <span class="nav-badge">Savings</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Overview Page -->
+            <div id="overview" class="page-section active">
+                <div class="hero-wrap">
+                    <div class="hero-title">Fleet Fuel <span style="color:var(--teal)">Intelligence</span> Dashboard</div>
+                    <div class="hero-sub">
+                        Predictive Modelling for Fuel Efficiency and Fleet Optimisation in Public Transport —
+                        combining 32,772 anonymised trip records with machine learning to surface KES 645M+ in
+                        fleet spend patterns and actionable savings opportunities.
+                    </div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-pill sp-t">
+                        <div class="stat-pill-val">32,772</div>
+                        <div class="stat-pill-label">Total Records</div>
+                        <div class="stat-pill-sub">Sheet1 + Sheet2 merged</div>
+                    </div>
+                    <div class="stat-pill sp-v">
+                        <div class="stat-pill-val">KES 645M</div>
+                        <div class="stat-pill-label">Total Fuel Spend</div>
+                        <div class="stat-pill-sub">Jan 2025 – Dec 2026</div>
+                    </div>
+                    <div class="stat-pill sp-a">
+                        <div class="stat-pill-val">5.845</div>
+                        <div class="stat-pill-label">Avg Efficiency (km/L)</div>
+                        <div class="stat-pill-sub">Full Tank trips</div>
+                    </div>
+                    <div class="stat-pill sp-r">
+                        <div class="stat-pill-val">91.0%</div>
+                        <div class="stat-pill-label">Over-EFC Trips</div>
+                        <div class="stat-pill-sub">Of trips with benchmark</div>
+                    </div>
+                    <div class="stat-pill sp-p">
+                        <div class="stat-pill-val">R²=0.9212</div>
+                        <div class="stat-pill-label">Gradient Boosting</div>
+                        <div class="stat-pill-sub">Champion model</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Monthly Fuel Cost Trend</div>
+                    <div id="overview-chart" class="plot-container"></div>
+                </div>
+            </div>
+
+            <!-- Other pages will be added here -->
+            <div id="trends" class="page-section">
+                <div class="card">
+                    <div class="card-title">Monthly Trends Analysis</div>
+                    <div id="trends-chart" class="plot-container"></div>
+                </div>
+            </div>
+
+            <div id="eda" class="page-section">
+                <div class="card">
+                    <div class="card-title">EDA Figures</div>
+                    <p>Exploratory Data Analysis figures from Notebook 1</p>
+                </div>
+            </div>
+
+            <div id="ml" class="page-section">
+                <div class="card">
+                    <div class="card-title">Machine Learning Models</div>
+                    <div id="ml-chart" class="plot-container"></div>
+                </div>
+            </div>
+
+            <div id="vehicles" class="page-section">
+                <div class="card">
+                    <div class="card-title">Vehicle Performance Analysis</div>
+                    <div id="vehicles-chart" class="plot-container"></div>
+                </div>
+            </div>
+
+            <div id="routes" class="page-section">
+                <div class="card">
+                    <div class="card-title">Route Efficiency Analysis</div>
+                    <div id="routes-chart" class="plot-container"></div>
+                </div>
+            </div>
+
+            <div id="deployment" class="page-section">
+                <div class="card">
+                    <div class="card-title">Deployment & Savings Analysis</div>
+                    <div id="deployment-chart" class="plot-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation handling
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all nav items and pages
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                document.querySelectorAll('.page-section').forEach(page => page.classList.remove('active'));
+                
+                // Add active class to clicked nav item and corresponding page
+                this.classList.add('active');
+                const pageId = this.getAttribute('data-page');
+                document.getElementById(pageId).classList.add('active');
+            });
+        });
+
+        // Sample data and charts
+        const months = ['Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025', 'Jun 2025',
+                       'Jul 2025', 'Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025',
+                       'Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026', 'May 2026', 'Jun 2026',
+                       'Jul 2026', 'Aug 2026', 'Sep 2026', 'Oct 2026', 'Nov 2026', 'Dec 2026'];
+
+        const fuelCosts = [28.5, 31.2, 29.8, 33.1, 35.6, 32.4, 34.8, 36.2, 31.9, 33.5, 35.1, 37.8,
+                          32.6, 34.2, 36.8, 38.1, 35.4, 37.2, 39.6, 41.3, 36.8, 38.9, 40.2, 42.1];
+
+        // Overview Chart
+        const overviewTrace = {
+            x: months,
+            y: fuelCosts,
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'Monthly Fuel Cost (M KES)',
+            line: { color: '#2DD4BF', width: 3 },
+            marker: { color: '#2DD4BF', size: 6 }
+        };
+
+        const overviewLayout = {
+            paper_bgcolor: '#130D20',
+            plot_bgcolor: '#130D20',
+            font: { color: '#EDE9FE', family: 'JetBrains Mono, monospace' },
+            xaxis: { gridcolor: '#2A1D45', color: '#6D5FA0' },
+            yaxis: { gridcolor: '#2A1D45', color: '#6D5FA0' },
+            margin: { l: 60, r: 20, t: 20, b: 60 },
+            showlegend: true
+        };
+
+        Plotly.newPlot('overview-chart', [overviewTrace], overviewLayout, {responsive: true});
+
+        // ML Models Comparison Chart
+        const mlTrace = {
+            x: ['Ridge Regression', 'Random Forest', 'Gradient Boosting', 'Neural Network'],
+            y: [0.8910, 0.9772, 0.9212, 0.9853],
+            type: 'bar',
+            marker: {
+                color: ['#F472B6', '#38BDF8', '#2DD4BF', '#A78BFA']
+            }
+        };
+
+        const mlLayout = {
+            ...overviewLayout,
+            title: 'Model R² Scores Comparison',
+            yaxis: { ...overviewLayout.yaxis, range: [0.8, 1.0] }
+        };
+
+        Plotly.newPlot('ml-chart', [mlTrace], mlLayout, {responsive: true});
+
+        // Vehicle Performance Chart
+        const vehicleTrace = {
+            x: ['VEH-001', 'VEH-002', 'VEH-003', 'VEH-004', 'VEH-005', 'VEH-006', 'VEH-007', 'VEH-008'],
+            y: [6.2, 5.8, 7.1, 4.9, 6.5, 5.4, 6.8, 5.9],
+            type: 'bar',
+            marker: {
+                color: ['#34D399', '#34D399', '#34D399', '#F87171', '#34D399', '#F87171', '#34D399', '#34D399']
+            }
+        };
+
+        const vehicleLayout = {
+            ...overviewLayout,
+            title: 'Vehicle Efficiency (km/L)',
+            yaxis: { ...overviewLayout.yaxis, title: 'Efficiency (km/L)' }
+        };
+
+        Plotly.newPlot('vehicles-chart', [vehicleTrace], vehicleLayout, {responsive: true});
+
+        // Route Efficiency Chart
+        const routeTrace = {
+            x: ['Route-A', 'Route-B', 'Route-C', 'Route-D', 'Route-E'],
+            y: [6.1, 5.4, 6.8, 5.9, 6.3],
+            type: 'scatter',
+            mode: 'markers',
+            marker: {
+                size: [20, 15, 25, 18, 22],
+                color: [6.1, 5.4, 6.8, 5.9, 6.3],
+                colorscale: 'Viridis',
+                showscale: true
+            }
+        };
+
+        const routeLayout = {
+            ...overviewLayout,
+            title: 'Route Efficiency Analysis',
+            yaxis: { ...overviewLayout.yaxis, title: 'Avg Efficiency (km/L)' }
+        };
+
+        Plotly.newPlot('routes-chart', [routeTrace], routeLayout, {responsive: true});
+
+        // Trends Chart
+        const trendsTrace1 = {
+            x: months,
+            y: fuelCosts,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Actual Cost',
+            line: { color: '#2DD4BF', width: 2 }
+        };
+
+        const trendsTrace2 = {
+            x: months,
+            y: fuelCosts.map((_, i) => fuelCosts.slice(Math.max(0, i-2), i+1).reduce((a, b, _, arr) => a + b/arr.length, 0)),
+            type: 'scatter',
+            mode: 'lines',
+            name: '3-Month MA',
+            line: { color: '#A78BFA', width: 3, dash: 'dash' }
+        };
+
+        const trendsLayout = {
+            ...overviewLayout,
+            title: 'Monthly Fuel Cost with 3-Month Moving Average'
+        };
+
+        Plotly.newPlot('trends-chart', [trendsTrace1, trendsTrace2], trendsLayout, {responsive: true});
+
+        // Deployment Chart
+        const deploymentTrace = {
+            labels: ['Vehicle A', 'Vehicle B', 'Vehicle C', 'Vehicle D', 'Vehicle E'],
+            values: [450000, 380000, 290000, 180000, 120000],
+            type: 'pie',
+            marker: {
+                colors: ['#2DD4BF', '#A78BFA', '#FCD34D', '#F472B6', '#F87171']
+            }
+        };
+
+        const deploymentLayout = {
+            ...overviewLayout,
+            title: 'Potential Annual Savings by Vehicle (KES)',
+            showlegend: true
+        };
+
+        Plotly.newPlot('deployment-chart', [deploymentTrace], deploymentLayout, {responsive: true});
+    </script>
+</body>
+</html>
