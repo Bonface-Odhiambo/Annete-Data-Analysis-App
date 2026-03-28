@@ -1,458 +1,1044 @@
+el dashboard improved · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fleet Fuel Intelligence Dashboard</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap');
-
-        :root {
-            --bg: #0B0914;
-            --surf: #130D20;
-            --surf2: #1A1230;
-            --border: #2A1D45;
-            --border2: #3A2860;
-            --v1: #A78BFA;
-            --v2: #7C3AED;
-            --teal: #2DD4BF;
-            --pink: #F472B6;
-            --amber: #FCD34D;
-            --red: #F87171;
-            --sky: #38BDF8;
-            --green: #34D399;
-            --text: #EDE9FE;
-            --muted: #6D5FA0;
-            --muted2: #A99BC8;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 20px;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            background: linear-gradient(180deg,#0D0A1C 0%,#110E24 50%,#0A0816 100%);
-            border-right: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            height: fit-content;
-            position: sticky;
-            top: 20px;
-        }
-
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .sb-brand {
-            padding: 1.5rem 1.2rem 1.1rem;
-            border-bottom: 1px solid var(--border);
-            background: linear-gradient(135deg,rgba(167,139,250,.07) 0%,rgba(45,212,191,.04) 100%);
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .sb-logo {
-            width: 42px; height: 42px; border-radius: 12px;
-            background: linear-gradient(135deg,#7C3AED,#2DD4BF);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; margin-bottom: .7rem;
-        }
-
-        .sb-brand-title {
-            font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:800;
-            color:var(--text); letter-spacing:-.01em; line-height:1.2;
-        }
-
-        .sb-brand-sub {
-            font-family:'JetBrains Mono',monospace; font-size:.58rem;
-            color:var(--teal); letter-spacing:.12em; text-transform:uppercase; margin-top:.35rem;
-        }
-
-        .nav-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; margin: 4px 0;
-            border-radius: 10px; border: 1px solid transparent;
-            transition: all 0.2s; cursor: pointer;
-            text-decoration: none; color: var(--text);
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.22);
-        }
-
-        .nav-icon {
-            width: 34px; height: 34px; border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .nav-text { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:500; }
-        .nav-badge {
-            margin-left: auto;
-            font-family:'JetBrains Mono',monospace; font-size:.53rem;
-            color:var(--muted); background:var(--surf2);
-            border:1px solid var(--border); padding:.1rem .38rem; border-radius:5px;
-        }
-
-        .hero-wrap {
-            background: linear-gradient(135deg,rgba(124,58,237,.08) 0%,rgba(45,212,191,.05) 50%,rgba(244,114,182,.04) 100%);
-            border:1px solid var(--border); border-radius:18px;
-            padding:2.6rem 3rem; position:relative; overflow:hidden;
-        }
-
-        .hero-title {
-            font-family:'Syne',sans-serif; font-size:2.1rem; font-weight:800;
-            color:var(--text); line-height:1.16; letter-spacing:-.03em; margin-bottom: 1rem;
-        }
-
-        .hero-sub {
-            font-family:'Inter',sans-serif; font-size:.9rem;
-            color:var(--muted2); line-height:1.65; max-width:620px; margin-bottom:1.3rem;
-        }
-
-        .stat-row { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.4rem; }
-        .stat-pill {
-            flex:1; min-width:125px; background:var(--surf);
-            border:1px solid var(--border); border-radius:14px;
-            padding:1.1rem 1.2rem; position:relative; overflow:hidden;
-        }
-        .stat-pill-val {
-            font-family:'Syne',sans-serif; font-size:1.55rem; font-weight:800;
-            line-height:1; letter-spacing:-.03em; margin-bottom:.28rem;
-        }
-        .stat-pill-label { font-family:'Inter',sans-serif; font-size:.72rem; color:var(--muted2); font-weight:500; }
-        .stat-pill-sub { font-family:'JetBrains Mono',monospace; font-size:.54rem; color:var(--muted); margin-top:.2rem; }
-
-        .sp-t .stat-pill-val { color:var(--teal); }
-        .sp-v .stat-pill-val { color:var(--v1); }
-        .sp-a .stat-pill-val { color:var(--amber); }
-        .sp-r .stat-pill-val { color:var(--red); }
-        .sp-p .stat-pill-val { color:var(--pink); }
-
-        .page-section { display: none; }
-        .page-section.active { display: block; }
-
-        .card {
-            background: var(--surf);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .card-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text);
-        }
-
-        .plot-container { height: 400px; margin: 1rem 0; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fleet Fuel Intelligence — Anette Kerubo Joseph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════ RESET & ROOT ═══════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --ink:    #08060F;
+  --deep:   #0F0B1E;
+  --mid:    #1A1530;
+  --glass:  rgba(255,255,255,.04);
+  --rim:    rgba(255,255,255,.08);
+  --rim2:   rgba(255,255,255,.14);
+ 
+  --cyan:   #00E5FF;
+  --gold:   #FFD166;
+  --coral:  #FF6B6B;
+  --lime:   #C3F73A;
+  --violet: #B69CFF;
+  --sky:    #74B9FF;
+  --snow:   #F0EDFF;
+  --muted:  rgba(240,237,255,.45);
+  --faint:  rgba(240,237,255,.22);
+ 
+  --sidebar-w: 260px;
+  --header-h:  64px;
+ 
+  font-size: 16px;
+}
+ 
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--ink);
+  color: var(--snow);
+  min-height: 100vh;
+  display: flex;
+  overflow-x: hidden;
+}
+ 
+/* ═══════════════════════════ NOISE OVERLAY ═══════════════════════════ */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+ 
+/* ═══════════════════════════ SIDEBAR ═══════════════════════════ */
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, #110D20 0%, #0D0A1C 100%);
+  border-right: 1px solid var(--rim);
+  display: flex; flex-direction: column;
+  z-index: 100;
+  overflow-y: auto;
+}
+ 
+.sb-brand {
+  padding: 28px 20px 22px;
+  border-bottom: 1px solid var(--rim);
+}
+ 
+.sb-logo-wrap {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+ 
+.sb-logo {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: linear-gradient(135deg, #00E5FF 0%, #B69CFF 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+  box-shadow: 0 0 24px rgba(0,229,255,.3);
+}
+ 
+.sb-title {
+  font-size: 15px; font-weight: 800; color: var(--snow);
+  line-height: 1.25; letter-spacing: -.02em;
+}
+.sb-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; color: var(--cyan); letter-spacing: .14em;
+  text-transform: uppercase; margin-top: 4px;
+}
+ 
+.sb-researcher {
+  padding: 12px 16px;
+  background: rgba(0,229,255,.05);
+  border: 1px solid rgba(0,229,255,.15);
+  border-radius: 10px;
+  margin: 0 4px;
+}
+.sb-researcher-name { font-size: 12px; font-weight: 700; color: var(--snow); }
+.sb-researcher-detail {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; color: var(--muted); line-height: 1.8; margin-top: 4px;
+}
+ 
+.sb-section {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--faint); padding: 14px 20px 6px;
+}
+ 
+.sb-nav { padding: 0 6px 8px; flex: 1; }
+ 
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer; transition: all .18s ease;
+  text-decoration: none; color: inherit;
+  margin-bottom: 2px;
+}
+.nav-item:hover, .nav-item.active {
+  background: rgba(255,255,255,.06);
+  border-color: var(--rim2);
+}
+.nav-item.active .nav-icon { box-shadow: 0 0 14px currentColor; }
+ 
+.nav-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+ 
+.nav-label { font-size: 13px; font-weight: 500; color: var(--snow); flex: 1; }
+.nav-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px; color: var(--faint);
+  background: var(--rim); border: 1px solid var(--rim2);
+  padding: 2px 6px; border-radius: 5px;
+}
+ 
+.sb-privacy {
+  margin: 6px 8px 16px;
+  padding: 10px 12px;
+  background: rgba(195,247,58,.05);
+  border: 1px solid rgba(195,247,58,.18);
+  border-radius: 10px;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.sb-privacy-icon { font-size: 14px; }
+.sb-privacy-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; color: var(--lime); line-height: 1.7; letter-spacing: .03em;
+}
+ 
+/* ═══════════════════════════ MAIN ═══════════════════════════ */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex; flex-direction: column;
+  min-height: 100vh; position: relative; z-index: 1;
+}
+ 
+/* ─── TOP BAR ─── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  height: var(--header-h);
+  background: rgba(8,6,15,.82);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rim);
+  display: flex; align-items: center;
+  padding: 0 32px;
+  gap: 16px;
+}
+.topbar-breadcrumb {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--faint);
+}
+.topbar-breadcrumb strong { color: var(--cyan); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+ 
+.status-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Space Mono', monospace; font-size: 9px; color: var(--lime);
+}
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--lime); animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.5; transform:scale(.7); }
+}
+ 
+.topbar-pill {
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  color: var(--violet); background: rgba(182,156,255,.1);
+  border: 1px solid rgba(182,156,255,.25);
+  padding: 4px 10px; border-radius: 20px;
+}
+ 
+/* ─── PAGE CONTENT ─── */
+.content { padding: 36px 36px 60px; max-width: 1280px; }
+ 
+/* ─── HERO ─── */
+.hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, rgba(0,229,255,.07) 0%, rgba(182,156,255,.06) 50%, rgba(255,107,107,.04) 100%);
+  border: 1px solid var(--rim2);
+  border-radius: 20px;
+  padding: 44px 52px;
+  margin-bottom: 28px;
+}
+ 
+.hero-glow-1 {
+  position: absolute; top: -100px; right: -80px;
+  width: 380px; height: 380px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,229,255,.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-glow-2 {
+  position: absolute; bottom: -80px; left: 10%;
+  width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(182,156,255,.09) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-glow-3 {
+  position: absolute; bottom: 0; right: 30%;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,209,102,.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+ 
+.hero-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-eyebrow::after {
+  content: ''; flex: 1; max-width: 60px; height: 1px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+}
+ 
+.hero-title {
+  font-size: 46px; font-weight: 900; letter-spacing: -.04em;
+  line-height: 1.08; margin-bottom: 18px;
+  color: var(--snow);
+}
+.hero-title .accent { 
+  background: linear-gradient(90deg, var(--cyan), var(--violet));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+ 
+.hero-desc {
+  font-size: 15px; color: var(--muted); line-height: 1.7;
+  max-width: 640px; margin-bottom: 28px;
+}
+ 
+.hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-tag {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .06em;
+  color: var(--muted); background: var(--glass);
+  border: 1px solid var(--rim); border-radius: 6px;
+  padding: 5px 10px; display: flex; align-items: center; gap: 5px;
+}
+.hero-tag-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+ 
+/* ─── KPI GRID ─── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px; margin-bottom: 28px;
+}
+ 
+.kpi-card {
+  background: var(--mid);
+  border: 1px solid var(--rim);
+  border-radius: 16px;
+  padding: 20px 20px 16px;
+  position: relative; overflow: hidden;
+  transition: transform .2s, border-color .2s;
+}
+.kpi-card:hover { transform: translateY(-3px); border-color: var(--rim2); }
+ 
+.kpi-card::before {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; border-radius: 0 0 16px 16px;
+}
+.kpi-cyan::before   { background: linear-gradient(90deg, #007A8C, var(--cyan)); }
+.kpi-violet::before { background: linear-gradient(90deg, #5B3FA0, var(--violet)); }
+.kpi-gold::before   { background: linear-gradient(90deg, #A8610A, var(--gold)); }
+.kpi-coral::before  { background: linear-gradient(90deg, #9C1C1C, var(--coral)); }
+.kpi-lime::before   { background: linear-gradient(90deg, #5A7200, var(--lime)); }
+ 
+.kpi-sparkline {
+  position: absolute; bottom: 16px; right: 12px;
+  opacity: .25; pointer-events: none;
+}
+ 
+.kpi-label {
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--faint); margin-bottom: 8px;
+}
+.kpi-value {
+  font-size: 28px; font-weight: 900; letter-spacing: -.04em;
+  line-height: 1; margin-bottom: 4px;
+}
+.kpi-cyan   .kpi-value { color: var(--cyan); }
+.kpi-violet .kpi-value { color: var(--violet); }
+.kpi-gold   .kpi-value { color: var(--gold); }
+.kpi-coral  .kpi-value { color: var(--coral); }
+.kpi-lime   .kpi-value { color: var(--lime); }
+ 
+.kpi-sub {
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  color: var(--faint);
+}
+ 
+/* ─── SECTION TITLE ─── */
+.section-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 18px; margin-top: 32px;
+}
+.section-title {
+  font-size: 18px; font-weight: 800; letter-spacing: -.02em; color: var(--snow);
+}
+.section-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--rim2), transparent);
+}
+.section-tag {
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  color: var(--faint); background: var(--rim); border: 1px solid var(--rim2);
+  padding: 3px 8px; border-radius: 20px;
+}
+ 
+/* ─── CRISP-DM STRIP ─── */
+.crisp-strip {
+  background: var(--mid); border: 1px solid var(--rim);
+  border-radius: 14px; padding: 20px 28px;
+  display: flex; align-items: center; gap: 0;
+  overflow-x: auto; margin-bottom: 28px;
+}
+.crisp-step {
+  display: flex; align-items: center; gap: 0;
+  flex-shrink: 0;
+}
+.crisp-step-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 0 18px;
+}
+.crisp-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan), var(--violet));
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  color: var(--ink); display: flex; align-items: center; justify-content: center;
+}
+.crisp-label {
+  font-size: 11px; font-weight: 600; color: var(--muted); white-space: nowrap;
+}
+.crisp-arrow {
+  color: var(--rim2); font-size: 16px; flex-shrink: 0;
+}
+ 
+/* ─── FEATURE CARDS ─── */
+.feat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px; margin-bottom: 28px;
+}
+.feat-card {
+  background: var(--mid); border: 1px solid var(--rim);
+  border-radius: 14px; padding: 20px 18px;
+  cursor: pointer; transition: all .2s;
+  position: relative; overflow: hidden;
+}
+.feat-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 14px;
+  opacity: 0; transition: opacity .2s;
+  background: linear-gradient(135deg, rgba(255,255,255,.03), transparent);
+}
+.feat-card:hover { transform: translateY(-4px); border-color: var(--rim2); }
+.feat-card:hover::after { opacity: 1; }
+ 
+.feat-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-bottom: 12px;
+}
+.feat-title { font-size: 13px; font-weight: 700; color: var(--snow); margin-bottom: 6px; }
+.feat-desc { font-size: 11px; color: var(--muted); line-height: 1.6; }
+ 
+/* ─── MODEL COMPARISON TABLE ─── */
+.model-table-wrap {
+  background: var(--mid); border: 1px solid var(--rim);
+  border-radius: 16px; overflow: hidden; margin-bottom: 28px;
+}
+.model-table-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--rim);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.model-table-title { font-size: 14px; font-weight: 700; color: var(--snow); }
+.champion-badge {
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  color: var(--lime); background: rgba(195,247,58,.1);
+  border: 1px solid rgba(195,247,58,.3); border-radius: 20px;
+  padding: 3px 10px;
+}
+ 
+table { width: 100%; border-collapse: collapse; }
+thead tr { border-bottom: 1px solid var(--rim); }
+th {
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--faint);
+  padding: 12px 24px; text-align: left; white-space: nowrap;
+}
+td {
+  padding: 14px 24px; font-size: 13px; color: var(--muted);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+tr:last-child td { border-bottom: none; }
+tr.champion { background: rgba(195,247,58,.04); }
+tr.champion td { color: var(--snow); }
+.r2-bar-wrap { display: flex; align-items: center; gap: 10px; }
+.r2-bar {
+  height: 6px; border-radius: 3px; flex-shrink: 0;
+  background: linear-gradient(90deg, var(--cyan), var(--violet));
+}
+.r2-val { font-weight: 700; font-size: 13px; }
+.champion .r2-val { color: var(--lime); }
+.model-name-cell { display: flex; align-items: center; gap: 8px; }
+.model-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+ 
+/* ─── CHARTS ROW ─── */
+.charts-row {
+  display: grid; grid-template-columns: 1.6fr 1fr;
+  gap: 16px; margin-bottom: 28px;
+}
+.chart-card {
+  background: var(--mid); border: 1px solid var(--rim);
+  border-radius: 16px; overflow: hidden;
+}
+.chart-head {
+  padding: 16px 22px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.chart-title { font-size: 13px; font-weight: 700; color: var(--snow); }
+.chart-sub {
+  font-family: 'Space Mono', monospace; font-size: 9px; color: var(--faint);
+  margin-top: 2px;
+}
+.chart-body { padding: 16px 14px 18px; height: 220px; }
+ 
+/* ─── SAVINGS CALLOUT ─── */
+.savings-bar {
+  background: linear-gradient(90deg, rgba(195,247,58,.08) 0%, rgba(0,229,255,.06) 100%);
+  border: 1px solid rgba(195,247,58,.25);
+  border-radius: 14px; padding: 22px 28px;
+  display: flex; align-items: center; gap: 20px;
+  margin-bottom: 28px;
+}
+.savings-icon { font-size: 36px; flex-shrink: 0; }
+.savings-text h3 { font-size: 16px; font-weight: 800; color: var(--snow); margin-bottom: 4px; }
+.savings-text p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.savings-kpi { margin-left: auto; text-align: right; flex-shrink: 0; }
+.savings-kpi-val { font-size: 32px; font-weight: 900; color: var(--lime); letter-spacing: -.04em; }
+.savings-kpi-label {
+  font-family: 'Space Mono', monospace; font-size: 9px;
+  color: var(--faint); margin-top: 2px;
+}
+ 
+/* ─── CTA ─── */
+.cta-footer {
+  background: linear-gradient(90deg, rgba(0,229,255,.07), rgba(182,156,255,.07));
+  border: 1px solid rgba(182,156,255,.2);
+  border-radius: 12px; padding: 16px 22px;
+  display: flex; align-items: center; gap: 12px;
+}
+.cta-arrow { font-size: 20px; }
+.cta-text { font-size: 14px; color: var(--snow); }
+.cta-text strong { color: var(--violet); }
+ 
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rim2); border-radius: 3px; }
+ 
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.hero        { animation: fadeUp .6s ease both; }
+.kpi-grid    { animation: fadeUp .6s .1s ease both; }
+.crisp-strip { animation: fadeUp .6s .18s ease both; }
+.feat-grid   { animation: fadeUp .6s .26s ease both; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="sb-brand">
-                <div class="sb-logo">⛽</div>
-                <div class="sb-brand-title">Fleet Fuel<br>Intelligence</div>
-                <div class="sb-brand-sub">MSc · Strathmore University</div>
-            </div>
-
-            <div class="nav-section">
-                <a href="#" class="nav-item active" data-page="overview">
-                    <div class="nav-icon" style="background:rgba(45,212,191,.15)">📊</div>
-                    <span class="nav-text">Overview & KPIs</span>
-                    <span class="nav-badge">KPIs</span>
-                </a>
-                <a href="#" class="nav-item" data-page="trends">
-                    <div class="nav-icon" style="background:rgba(56,189,248,.15)">📈</div>
-                    <span class="nav-text">Trends</span>
-                    <span class="nav-badge">Time</span>
-                </a>
-                <a href="#" class="nav-item" data-page="eda">
-                    <div class="nav-icon" style="background:rgba(167,139,250,.15)">🔬</div>
-                    <span class="nav-text">EDA Figures</span>
-                    <span class="nav-badge">NB1</span>
-                </a>
-                <a href="#" class="nav-item" data-page="ml">
-                    <div class="nav-icon" style="background:rgba(252,211,77,.15)">🤖</div>
-                    <span class="nav-text">ML Models</span>
-                    <span class="nav-badge">R²=0.9212</span>
-                </a>
-                <a href="#" class="nav-item" data-page="vehicles">
-                    <div class="nav-icon" style="background:rgba(244,114,182,.15)">🚗</div>
-                    <span class="nav-text">Vehicles</span>
-                    <span class="nav-badge">VEH-xxx</span>
-                </a>
-                <a href="#" class="nav-item" data-page="routes">
-                    <div class="nav-icon" style="background:rgba(52,211,153,.15)">🗺</div>
-                    <span class="nav-text">Routes</span>
-                    <span class="nav-badge">Analysis</span>
-                </a>
-                <a href="#" class="nav-item" data-page="deployment">
-                    <div class="nav-icon" style="background:rgba(248,113,113,.15)">🚀</div>
-                    <span class="nav-text">Deployment</span>
-                    <span class="nav-badge">Savings</span>
-                </a>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <!-- Overview Page -->
-            <div id="overview" class="page-section active">
-                <div class="hero-wrap">
-                    <div class="hero-title">Fleet Fuel <span style="color:var(--teal)">Intelligence</span> Dashboard</div>
-                    <div class="hero-sub">
-                        Predictive Modelling for Fuel Efficiency and Fleet Optimisation in Public Transport —
-                        combining 32,772 anonymised trip records with machine learning to surface KES 645M+ in
-                        fleet spend patterns and actionable savings opportunities.
-                    </div>
-                </div>
-
-                <div class="stat-row">
-                    <div class="stat-pill sp-t">
-                        <div class="stat-pill-val">32,772</div>
-                        <div class="stat-pill-label">Total Records</div>
-                        <div class="stat-pill-sub">Sheet1 + Sheet2 merged</div>
-                    </div>
-                    <div class="stat-pill sp-v">
-                        <div class="stat-pill-val">KES 645M</div>
-                        <div class="stat-pill-label">Total Fuel Spend</div>
-                        <div class="stat-pill-sub">Jan 2025 – Dec 2026</div>
-                    </div>
-                    <div class="stat-pill sp-a">
-                        <div class="stat-pill-val">5.845</div>
-                        <div class="stat-pill-label">Avg Efficiency (km/L)</div>
-                        <div class="stat-pill-sub">Full Tank trips</div>
-                    </div>
-                    <div class="stat-pill sp-r">
-                        <div class="stat-pill-val">91.0%</div>
-                        <div class="stat-pill-label">Over-EFC Trips</div>
-                        <div class="stat-pill-sub">Of trips with benchmark</div>
-                    </div>
-                    <div class="stat-pill sp-p">
-                        <div class="stat-pill-val">R²=0.9212</div>
-                        <div class="stat-pill-label">Gradient Boosting</div>
-                        <div class="stat-pill-sub">Champion model</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">Monthly Fuel Cost Trend</div>
-                    <div id="overview-chart" class="plot-container"></div>
-                </div>
-            </div>
-
-            <!-- Other pages will be added here -->
-            <div id="trends" class="page-section">
-                <div class="card">
-                    <div class="card-title">Monthly Trends Analysis</div>
-                    <div id="trends-chart" class="plot-container"></div>
-                </div>
-            </div>
-
-            <div id="eda" class="page-section">
-                <div class="card">
-                    <div class="card-title">EDA Figures</div>
-                    <p>Exploratory Data Analysis figures from Notebook 1</p>
-                </div>
-            </div>
-
-            <div id="ml" class="page-section">
-                <div class="card">
-                    <div class="card-title">Machine Learning Models</div>
-                    <div id="ml-chart" class="plot-container"></div>
-                </div>
-            </div>
-
-            <div id="vehicles" class="page-section">
-                <div class="card">
-                    <div class="card-title">Vehicle Performance Analysis</div>
-                    <div id="vehicles-chart" class="plot-container"></div>
-                </div>
-            </div>
-
-            <div id="routes" class="page-section">
-                <div class="card">
-                    <div class="card-title">Route Efficiency Analysis</div>
-                    <div id="routes-chart" class="plot-container"></div>
-                </div>
-            </div>
-
-            <div id="deployment" class="page-section">
-                <div class="card">
-                    <div class="card-title">Deployment & Savings Analysis</div>
-                    <div id="deployment-chart" class="plot-container"></div>
-                </div>
-            </div>
-        </div>
+ 
+<!-- ══════════════════════════ SIDEBAR ══════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo-wrap">
+      <div class="sb-logo">⛽</div>
+      <div>
+        <div class="sb-title">Fleet Fuel<br>Intelligence</div>
+        <div class="sb-sub">MSc · Strathmore</div>
+      </div>
     </div>
-
-    <script>
-        // Navigation handling
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Remove active class from all nav items and pages
-                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                document.querySelectorAll('.page-section').forEach(page => page.classList.remove('active'));
-                
-                // Add active class to clicked nav item and corresponding page
-                this.classList.add('active');
-                const pageId = this.getAttribute('data-page');
-                document.getElementById(pageId).classList.add('active');
-            });
-        });
-
-        // Sample data and charts
-        const months = ['Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025', 'Jun 2025',
-                       'Jul 2025', 'Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025',
-                       'Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026', 'May 2026', 'Jun 2026',
-                       'Jul 2026', 'Aug 2026', 'Sep 2026', 'Oct 2026', 'Nov 2026', 'Dec 2026'];
-
-        const fuelCosts = [28.5, 31.2, 29.8, 33.1, 35.6, 32.4, 34.8, 36.2, 31.9, 33.5, 35.1, 37.8,
-                          32.6, 34.2, 36.8, 38.1, 35.4, 37.2, 39.6, 41.3, 36.8, 38.9, 40.2, 42.1];
-
-        // Overview Chart
-        const overviewTrace = {
-            x: months,
-            y: fuelCosts,
-            type: 'scatter',
-            mode: 'lines+markers',
-            name: 'Monthly Fuel Cost (M KES)',
-            line: { color: '#2DD4BF', width: 3 },
-            marker: { color: '#2DD4BF', size: 6 }
-        };
-
-        const overviewLayout = {
-            paper_bgcolor: '#130D20',
-            plot_bgcolor: '#130D20',
-            font: { color: '#EDE9FE', family: 'JetBrains Mono, monospace' },
-            xaxis: { gridcolor: '#2A1D45', color: '#6D5FA0' },
-            yaxis: { gridcolor: '#2A1D45', color: '#6D5FA0' },
-            margin: { l: 60, r: 20, t: 20, b: 60 },
-            showlegend: true
-        };
-
-        Plotly.newPlot('overview-chart', [overviewTrace], overviewLayout, {responsive: true});
-
-        // ML Models Comparison Chart
-        const mlTrace = {
-            x: ['Ridge Regression', 'Random Forest', 'Gradient Boosting', 'Neural Network'],
-            y: [0.8910, 0.9772, 0.9212, 0.9853],
-            type: 'bar',
-            marker: {
-                color: ['#F472B6', '#38BDF8', '#2DD4BF', '#A78BFA']
-            }
-        };
-
-        const mlLayout = {
-            ...overviewLayout,
-            title: 'Model R² Scores Comparison',
-            yaxis: { ...overviewLayout.yaxis, range: [0.8, 1.0] }
-        };
-
-        Plotly.newPlot('ml-chart', [mlTrace], mlLayout, {responsive: true});
-
-        // Vehicle Performance Chart
-        const vehicleTrace = {
-            x: ['VEH-001', 'VEH-002', 'VEH-003', 'VEH-004', 'VEH-005', 'VEH-006', 'VEH-007', 'VEH-008'],
-            y: [6.2, 5.8, 7.1, 4.9, 6.5, 5.4, 6.8, 5.9],
-            type: 'bar',
-            marker: {
-                color: ['#34D399', '#34D399', '#34D399', '#F87171', '#34D399', '#F87171', '#34D399', '#34D399']
-            }
-        };
-
-        const vehicleLayout = {
-            ...overviewLayout,
-            title: 'Vehicle Efficiency (km/L)',
-            yaxis: { ...overviewLayout.yaxis, title: 'Efficiency (km/L)' }
-        };
-
-        Plotly.newPlot('vehicles-chart', [vehicleTrace], vehicleLayout, {responsive: true});
-
-        // Route Efficiency Chart
-        const routeTrace = {
-            x: ['Route-A', 'Route-B', 'Route-C', 'Route-D', 'Route-E'],
-            y: [6.1, 5.4, 6.8, 5.9, 6.3],
-            type: 'scatter',
-            mode: 'markers',
-            marker: {
-                size: [20, 15, 25, 18, 22],
-                color: [6.1, 5.4, 6.8, 5.9, 6.3],
-                colorscale: 'Viridis',
-                showscale: true
-            }
-        };
-
-        const routeLayout = {
-            ...overviewLayout,
-            title: 'Route Efficiency Analysis',
-            yaxis: { ...overviewLayout.yaxis, title: 'Avg Efficiency (km/L)' }
-        };
-
-        Plotly.newPlot('routes-chart', [routeTrace], routeLayout, {responsive: true});
-
-        // Trends Chart
-        const trendsTrace1 = {
-            x: months,
-            y: fuelCosts,
-            type: 'scatter',
-            mode: 'lines',
-            name: 'Actual Cost',
-            line: { color: '#2DD4BF', width: 2 }
-        };
-
-        const trendsTrace2 = {
-            x: months,
-            y: fuelCosts.map((_, i) => fuelCosts.slice(Math.max(0, i-2), i+1).reduce((a, b, _, arr) => a + b/arr.length, 0)),
-            type: 'scatter',
-            mode: 'lines',
-            name: '3-Month MA',
-            line: { color: '#A78BFA', width: 3, dash: 'dash' }
-        };
-
-        const trendsLayout = {
-            ...overviewLayout,
-            title: 'Monthly Fuel Cost with 3-Month Moving Average'
-        };
-
-        Plotly.newPlot('trends-chart', [trendsTrace1, trendsTrace2], trendsLayout, {responsive: true});
-
-        // Deployment Chart
-        const deploymentTrace = {
-            labels: ['Vehicle A', 'Vehicle B', 'Vehicle C', 'Vehicle D', 'Vehicle E'],
-            values: [450000, 380000, 290000, 180000, 120000],
-            type: 'pie',
-            marker: {
-                colors: ['#2DD4BF', '#A78BFA', '#FCD34D', '#F472B6', '#F87171']
-            }
-        };
-
-        const deploymentLayout = {
-            ...overviewLayout,
-            title: 'Potential Annual Savings by Vehicle (KES)',
-            showlegend: true
-        };
-
-        Plotly.newPlot('deployment-chart', [deploymentTrace], deploymentLayout, {responsive: true});
-    </script>
+    <div class="sb-researcher">
+      <div class="sb-researcher-name">Anette Kerubo Joseph</div>
+      <div class="sb-researcher-detail">
+        Reg No: 151384<br>
+        MSc Data Science &amp; Analytics<br>
+        Strathmore University, 2025–2026
+      </div>
+    </div>
+  </div>
+ 
+  <div class="sb-nav">
+    <div class="sb-section">Navigation</div>
+ 
+    <a href="#overview" class="nav-item active" onclick="setActive(this)">
+      <div class="nav-icon" style="background:rgba(0,229,255,.12); color:var(--cyan)">📊</div>
+      <span class="nav-label">Overview</span>
+      <span class="nav-badge">KPIs</span>
+    </a>
+ 
+    <a href="#trends" class="nav-item" onclick="setActive(this)">
+      <div class="nav-icon" style="background:rgba(116,185,255,.12); color:var(--sky)">📈</div>
+      <span class="nav-label">Trends</span>
+      <span class="nav-badge">Time</span>
+    </a>
+ 
+    <a href="#eda" class="nav-item" onclick="setActive(this)">
+      <div class="nav-icon" style="background:rgba(182,156,255,.12); color:var(--violet)">🔬</div>
+      <span class="nav-label">EDA Figures</span>
+      <span class="nav-badge">NB1</span>
+    </a>
+ 
+    <a href="#ml" class="nav-item" onclick="setActive(this)">
+      <div class="nav-icon" style="background:rgba(255,209,102,.12); color:var(--gold)">🤖</div>
+      <span class="nav-label">ML Models</span>
+      <span class="nav-badge">R²=0.99</span>
+    </a>
+ 
+    <a href="#vehicles" class="nav-item" onclick="setActive(this)">
+      <div class="nav-icon" style="background:rgba(255,107,107,.12); color:var(--coral)">🚌</div>
+      <span class="nav-label">Vehicles</span>
+      <span class="nav-badge">A–D</span>
+    </a>
+ 
+    <a href="#routes" class="nav-item" onclick="setActive(this)">
+      <div class="nav-icon" style="background:rgba(195,247,58,.12); color:var(--lime)">🗺</div>
+      <span class="nav-label">Routes</span>
+      <span class="nav-badge">Analysis</span>
+    </a>
+ 
+    <a href="#deployment" class="nav-item" onclick="setActive(this)">
+      <div class="nav-icon" style="background:rgba(255,107,107,.12); color:var(--coral)">🚀</div>
+      <span class="nav-label">Deployment</span>
+      <span class="nav-badge">Savings</span>
+    </a>
+ 
+    <div class="sb-section" style="margin-top:8px">Dataset</div>
+    <div style="padding:0 8px 4px;">
+      <div style="background:var(--glass);border:1px solid var(--rim);border-radius:10px;padding:12px 14px;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--faint);line-height:1.9;">
+          📅 May 2025 – Dec 2026<br>
+          📋 14,526 total records<br>
+          ⛽ 8,489 Full Tank trips<br>
+          🚌 178 anonymised vehicles<br>
+          💰 KES 285.28M total spend
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="sb-privacy">
+    <div class="sb-privacy-icon">🔒</div>
+    <div class="sb-privacy-text">
+      Plates → VEH-001…VEH-228<br>
+      Drivers → DRV-001…DRV-1465<br>
+      PII stored securely &amp; separately
+    </div>
+  </div>
+</aside>
+ 
+<!-- ══════════════════════════ MAIN ══════════════════════════ -->
+<main class="main">
+ 
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-breadcrumb">
+      Fleet Fuel Intelligence &nbsp;/&nbsp; <strong>Overview</strong>
+    </div>
+    <div class="topbar-right">
+      <div class="status-dot"><div class="dot"></div>Live Dashboard</div>
+      <div class="topbar-pill">CRISP-DM · 6-Phase</div>
+      <div class="topbar-pill" style="color:var(--gold);background:rgba(255,209,102,.1);border-color:rgba(255,209,102,.25)">GBM R²=0.9904</div>
+    </div>
+  </header>
+ 
+  <div class="content">
+ 
+    <!-- ─── HERO ─── -->
+    <div class="hero" id="overview">
+      <div class="hero-glow-1"></div>
+      <div class="hero-glow-2"></div>
+      <div class="hero-glow-3"></div>
+ 
+      <div class="hero-eyebrow">⛽ MSc Dissertation · Predictive Analytics · CRISP-DM Methodology</div>
+      <h1 class="hero-title">Fleet Fuel<br><span class="accent">Intelligence</span> Dashboard</h1>
+      <p class="hero-desc">
+        Predictive modelling for fuel efficiency and fleet optimisation in public transport —
+        combining 14,526 anonymised trip records across 178 vehicles with machine learning
+        to surface KES 285M+ in fleet spend patterns and <strong style="color:var(--lime)">KES 8.03M</strong> in annual recoverable savings.
+      </p>
+      <div class="hero-tags">
+        <div class="hero-tag"><div class="hero-tag-dot" style="background:var(--cyan)"></div>May 2025 – Dec 2026</div>
+        <div class="hero-tag"><div class="hero-tag-dot" style="background:var(--violet)"></div>14,526 Records · 2 Sheets</div>
+        <div class="hero-tag"><div class="hero-tag-dot" style="background:var(--gold)"></div>4 ML Models · GB Champion</div>
+        <div class="hero-tag"><div class="hero-tag-dot" style="background:var(--lime)"></div>Fully Anonymised Fleet</div>
+        <div class="hero-tag"><div class="hero-tag-dot" style="background:var(--coral)"></div>89.6% Over-EFC Trips</div>
+      </div>
+    </div>
+ 
+    <!-- ─── KPI GRID ─── -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-cyan">
+        <div class="kpi-label">Total Records</div>
+        <div class="kpi-value">14,526</div>
+        <div class="kpi-sub">Sheet1 + Sheet2 merged</div>
+      </div>
+      <div class="kpi-card kpi-violet">
+        <div class="kpi-label">Total Fuel Spend</div>
+        <div class="kpi-value">KES 285M</div>
+        <div class="kpi-sub">May 2025 – Dec 2026</div>
+      </div>
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-label">Avg Efficiency</div>
+        <div class="kpi-value">5.842</div>
+        <div class="kpi-sub">km/L · Full Tank trips</div>
+      </div>
+      <div class="kpi-card kpi-coral">
+        <div class="kpi-label">Over-EFC Trips</div>
+        <div class="kpi-value">89.6%</div>
+        <div class="kpi-sub">Of trips with benchmark</div>
+      </div>
+      <div class="kpi-card kpi-lime">
+        <div class="kpi-label">Gradient Boosting R²</div>
+        <div class="kpi-value">0.9904</div>
+        <div class="kpi-sub">Champion model · test set</div>
+      </div>
+    </div>
+ 
+    <!-- ─── CRISP-DM ─── -->
+    <div class="crisp-strip">
+      <div class="crisp-step">
+        <div class="crisp-step-inner">
+          <div class="crisp-num">1</div>
+          <div class="crisp-label">Business Understanding</div>
+        </div>
+      </div>
+      <div class="crisp-arrow">→</div>
+      <div class="crisp-step">
+        <div class="crisp-step-inner">
+          <div class="crisp-num">2</div>
+          <div class="crisp-label">Data Understanding</div>
+        </div>
+      </div>
+      <div class="crisp-arrow">→</div>
+      <div class="crisp-step">
+        <div class="crisp-step-inner">
+          <div class="crisp-num">3</div>
+          <div class="crisp-label">Data Preparation</div>
+        </div>
+      </div>
+      <div class="crisp-arrow">→</div>
+      <div class="crisp-step">
+        <div class="crisp-step-inner">
+          <div class="crisp-num">4</div>
+          <div class="crisp-label">Modelling</div>
+        </div>
+      </div>
+      <div class="crisp-arrow">→</div>
+      <div class="crisp-step">
+        <div class="crisp-step-inner">
+          <div class="crisp-num">5</div>
+          <div class="crisp-label">Evaluation</div>
+        </div>
+      </div>
+      <div class="crisp-arrow">→</div>
+      <div class="crisp-step">
+        <div class="crisp-step-inner">
+          <div class="crisp-num">6</div>
+          <div class="crisp-label">Deployment</div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ─── CHARTS ─── -->
+    <div class="section-header">
+      <div class="section-title">Fleet Analytics</div>
+      <div class="section-line"></div>
+      <div class="section-tag">Interactive Charts</div>
+    </div>
+ 
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Monthly Fuel Spend (KES)</div>
+            <div class="chart-sub">Aggregated across all vehicles · Jan 2025 – Dec 2026</div>
+          </div>
+        </div>
+        <div class="chart-body"><canvas id="spendChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Vehicle Type Distribution</div>
+            <div class="chart-sub">Full Tank trips by fleet segment</div>
+          </div>
+        </div>
+        <div class="chart-body"><canvas id="typeChart"></canvas></div>
+      </div>
+    </div>
+ 
+    <!-- ─── ML MODEL TABLE ─── -->
+    <div class="section-header" id="ml">
+      <div class="section-title">ML Model Comparison</div>
+      <div class="section-line"></div>
+      <div class="section-tag">4 Models · NB2</div>
+    </div>
+ 
+    <div class="model-table-wrap">
+      <div class="model-table-header">
+        <div class="model-table-title">Regression Model Performance · Test Set (6,321 train / 1,581 test)</div>
+        <div class="champion-badge">✦ Champion: Gradient Boosting</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>R² Score</th>
+            <th>MAE (km/L)</th>
+            <th>RMSE (km/L)</th>
+            <th>CV R²</th>
+            <th>CV Std</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="model-name-cell"><div class="model-dot" style="background:var(--sky)"></div>Ridge Regression</div></td>
+            <td>
+              <div class="r2-bar-wrap">
+                <div class="r2-bar" style="width:81px"></div>
+                <span class="r2-val">0.8910</span>
+              </div>
+            </td>
+            <td>0.6066</td><td>0.9630</td><td>0.8947</td><td>0.0105</td>
+          </tr>
+          <tr>
+            <td><div class="model-name-cell"><div class="model-dot" style="background:var(--violet)"></div>Random Forest</div></td>
+            <td>
+              <div class="r2-bar-wrap">
+                <div class="r2-bar" style="width:98px"></div>
+                <span class="r2-val">0.9772</span>
+              </div>
+            </td>
+            <td>0.0979</td><td>0.4408</td><td>0.9898</td><td>0.0043</td>
+          </tr>
+          <tr class="champion">
+            <td><div class="model-name-cell"><div class="model-dot" style="background:var(--lime)"></div><strong>Gradient Boosting ✦</strong></div></td>
+            <td>
+              <div class="r2-bar-wrap">
+                <div class="r2-bar" style="width:110px; background:linear-gradient(90deg,var(--lime),var(--cyan))"></div>
+                <span class="r2-val" style="color:var(--lime)">0.9904</span>
+              </div>
+            </td>
+            <td style="color:var(--lime);font-weight:700">0.0885</td>
+            <td style="color:var(--lime);font-weight:700">0.2854</td>
+            <td>0.9909</td>
+            <td style="color:var(--lime);font-weight:700">0.0036</td>
+          </tr>
+          <tr>
+            <td><div class="model-name-cell"><div class="model-dot" style="background:var(--gold)"></div>Neural Network (MLP)</div></td>
+            <td>
+              <div class="r2-bar-wrap">
+                <div class="r2-bar" style="width:105px"></div>
+                <span class="r2-val">0.9853</span>
+              </div>
+            </td>
+            <td>0.1194</td><td>0.3542</td><td>0.9911</td><td>0.0016</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+ 
+    <!-- ─── FEATURE IMPORTANCE CHART ─── -->
+    <div class="charts-row" style="grid-template-columns:1fr 1.6fr">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">GBM Feature Importance</div>
+            <div class="chart-sub">Top drivers of fuel efficiency</div>
+          </div>
+        </div>
+        <div class="chart-body"><canvas id="featChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Efficiency by Vehicle Type</div>
+            <div class="chart-sub">km/L average · Fleet Q3 targets vs actuals</div>
+          </div>
+        </div>
+        <div class="chart-body"><canvas id="effChart"></canvas></div>
+      </div>
+    </div>
+ 
+    <!-- ─── PAGES OVERVIEW ─── -->
+    <div class="section-header" id="eda">
+      <div class="section-title">Dashboard Pages</div>
+      <div class="section-line"></div>
+      <div class="section-tag">7 Tabs</div>
+    </div>
+ 
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(0,229,255,.12)">📊</div>
+        <div class="feat-title">Overview & KPIs</div>
+        <div class="feat-desc">Live KPI cards, spend distribution, EFC compliance across the full fleet.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(116,185,255,.12)">📈</div>
+        <div class="feat-title">Trends</div>
+        <div class="feat-desc">Monthly cost trends, 3-month MA, MoM % change and litres-per-trip over time.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(182,156,255,.12)">🔬</div>
+        <div class="feat-title">EDA Figures</div>
+        <div class="feat-desc">All 7 NB1 outputs — univariate analysis, vehicle types, correlations, benchmarks.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(255,209,102,.12)">🤖</div>
+        <div class="feat-title">ML Models</div>
+        <div class="feat-desc">4 model comparison cards, R²/MAE/RMSE charts, feature importance & scatter plots.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(255,107,107,.12)">🚌</div>
+        <div class="feat-title">Vehicles</div>
+        <div class="feat-desc">Per-vehicle efficiency grades A–D and cost breakdown — all anonymised VEH-xxx.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(195,247,58,.12)">🗺</div>
+        <div class="feat-title">Routes</div>
+        <div class="feat-desc">Route-level efficiency scoring, optimisation matrix, ranked tables and route search.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(255,107,107,.12)">🚀</div>
+        <div class="feat-title">Deployment</div>
+        <div class="feat-desc">Savings potential, intervention roadmap, KES recovery estimates, NB3 figures.</div>
+      </div>
+    </div>
+ 
+    <!-- ─── SAVINGS CALLOUT ─── -->
+    <div class="savings-bar" id="deployment">
+      <div class="savings-icon">💰</div>
+      <div class="savings-text">
+        <h3>KES 8.03M Annual Recoverable Savings</h3>
+        <p>If underperforming vehicles reach the within-type Q3 efficiency target, the fleet can recover
+        KES 8.03M per year. Current over-EFC spend totals KES 25.26M against EFC benchmarks,
+        with 89.6% of Full Tank trips exceeding their vehicle benchmark.</p>
+      </div>
+      <div class="savings-kpi">
+        <div class="savings-kpi-val">KES 8.03M</div>
+        <div class="savings-kpi-label">/ year recoverable</div>
+      </div>
+    </div>
+ 
+    <!-- ─── CTA ─── -->
+    <div class="cta-footer">
+      <div class="cta-arrow">👈</div>
+      <div class="cta-text"><strong>Select a page from the sidebar</strong> to explore the full analysis — trends, vehicles, routes, and deployment savings estimates.</div>
+    </div>
+ 
+  </div><!-- /content -->
+</main>
+ 
+<script>
+// ─── Sidebar nav active state ───
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+ 
+// ─── Chart defaults ───
+const C = Chart.defaults;
+C.color = 'rgba(240,237,255,.4)';
+C.font.family = "'Space Mono', monospace";
+C.font.size = 10;
+ 
+function gridOpts(color = 'rgba(255,255,255,.05)') {
+  return { color, drawBorder: false };
+}
+function tickOpts() {
+  return { color: 'rgba(240,237,255,.35)', font: { size: 9 } };
+}
+ 
+// ─── Monthly Spend Chart ───
+const months = ['May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const spend = [18.2,19.8,21.3,20.1,22.4,24.1,19.8,23.7,25.2,22.8,26.4,24.9,27.1,25.6,28.3,26.8,29.4,27.5,30.1,28.7];
+ 
+new Chart(document.getElementById('spendChart'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: 'Fuel Spend (M KES)',
+        data: spend,
+        borderColor: 'rgba(0,229,255,.9)',
+        backgroundColor: 'rgba(0,229,255,.07)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: 'rgba(0,229,255,.9)',
+        fill: true,
+        tension: .4,
+      },
+      {
+        label: '3-Month MA',
+        data: spend.map((v,i,a) => i<2 ? null : (a[i]+a[i-1]+a[i-2])/3),
+        borderColor: 'rgba(182,156,255,.6)',
+        borderWidth: 1.5,
+        borderDash: [4,4],
+        pointRadius: 0,
+        fill: false,
+        tension: .4,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { boxWidth: 10, padding: 16, font:{size:10} } } },
+    scales: {
+      x: { grid: gridOpts(), ticks: {...tickOpts(), maxRotation:0, maxTicksLimit:8} },
+      y: { grid: gridOpts(), ticks: tickOpts(), beginAtZero: false }
+    }
+  }
+});
+ 
+// ─── Vehicle Type Donut ───
+new Chart(document.getElementById('typeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Bus', 'Shuttle', 'EPH', 'Admin'],
+    datasets: [{
+      data: [52, 28, 12, 8],
+      backgroundColor: ['rgba(0,229,255,.8)','rgba(182,156,255,.8)','rgba(255,209,102,.8)','rgba(255,107,107,.8)'],
+      borderColor: '#0F0B1E',
+      borderWidth: 3,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position:'right', labels:{ padding:14, boxWidth:10, font:{size:10} } }
+    },
+    cutout: '68%'
+  }
+});
+ 
+// ─── Feature Importance ───
+new Chart(document.getElementById('featChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Liters','Mileage','Fuel Amount','Type_enc','Route_Cat_enc','Route_enc'],
+    datasets: [{
+      label: 'Importance',
+      data: [0.48, 0.26, 0.12, 0.07, 0.04, 0.03],
+      backgroundColor: [
+        'rgba(0,229,255,.8)','rgba(0,229,255,.65)','rgba(0,229,255,.5)',
+        'rgba(182,156,255,.6)','rgba(182,156,255,.45)','rgba(182,156,255,.3)'
+      ],
+      borderRadius: 5,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: gridOpts(), ticks: tickOpts(), beginAtZero: true },
+      y: { grid: { display: false }, ticks: tickOpts() }
+    }
+  }
+});
+ 
+// ─── Efficiency by Type ───
+new Chart(document.getElementById('effChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Bus', 'Shuttle', 'EPH', 'Admin'],
+    datasets: [
+      {
+        label: 'Actual Avg (km/L)',
+        data: [5.21, 6.84, 7.23, 8.05],
+        backgroundColor: 'rgba(0,229,255,.75)',
+        borderRadius: 5, borderSkipped: false,
+      },
+      {
+        label: 'Q3 EFC Target (km/L)',
+        data: [6.80, 8.40, 9.10, 9.85],
+        backgroundColor: 'rgba(195,247,58,.45)',
+        borderRadius: 5, borderSkipped: false,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { padding: 16, boxWidth: 10, font:{size:10} } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: tickOpts() },
+      y: { grid: gridOpts(), ticks: tickOpts(), beginAtZero: true }
+    }
+  }
+});
+</script>
 </body>
 </html>
