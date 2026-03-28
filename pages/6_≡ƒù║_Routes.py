@@ -1,150 +1,134 @@
-"""Page 6 — Routes"""
+"""
+Page 6 — Routes
+"""
 import streamlit as st
 import plotly.graph_objects as go
-import numpy as np
+import plotly.express as px
+
+st.set_page_config(page_title="Routes | Fleet Fuel", page_icon="🗺", layout="wide")
+
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from utils import (load_data, get_route_scores, display_df, TYPE_COLORS,
-                   ACCENT, BLUE, AMBER, RED,
-                   BG, SURF, BORDER, TEXT, MUTED, PLOTLY_LAYOUT, apply_layout, hex_alpha)
+from theme import inject_css, sidebar_brand, sec_header, insight, apply_plotly
+from utils import load_data, get_route_scores, display_df
 
-st.set_page_config(page_title="Routes · Fleet Fuel", page_icon="🗺", layout="wide")
-st.markdown("""<style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
-:root{--bg:#0B0914;--surf:#130D20;--surf2:#1A1230;--border:#2A1D45;--border2:#3A2860;--v1:#A78BFA;--v2:#7C3AED;--teal:#2DD4BF;--pink:#F472B6;--amber:#FCD34D;--red:#F87171;--sky:#38BDF8;--green:#34D399;--text:#EDE9FE;--muted:#6D5FA0;--muted2:#A99BC8;}
-.stApp{background-color:var(--bg);color:var(--text);}
-section[data-testid="stSidebar"]{background:linear-gradient(180deg,#0D0A1C 0%,#110E24 50%,#0A0816 100%)!important;border-right:1px solid var(--border)!important;min-width:268px!important;}
-section[data-testid="stSidebar"]>div{padding:0!important;}
-.sb-brand{padding:1.5rem 1.2rem 1.1rem;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(167,139,250,.07) 0%,rgba(45,212,191,.04) 100%);}
-.sb-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#7C3AED,#2DD4BF);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:.7rem;}
-.sb-brand-title{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);letter-spacing:-.01em;line-height:1.2;margin:0;}
-.sb-brand-sub{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-top:.35rem;}
-.sb-section-label{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:.9rem 1.2rem .35rem;}
-.sb-nav-item{display:flex;align-items:center;gap:.7rem;padding:.52rem 1rem;margin:.06rem .5rem;border-radius:10px;border:1px solid transparent;transition:background .15s,border-color .15s;}
-.sb-nav-item:hover{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.22);}
-.sb-nav-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.sb-nav-text{font-family:'Inter',sans-serif;font-size:.82rem;font-weight:500;color:var(--text);}
-.sb-nav-badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.53rem;color:var(--muted);background:var(--surf2);border:1px solid var(--border);padding:.1rem .38rem;border-radius:5px;}
-.sb-author{margin:.7rem .5rem .4rem;padding:.75rem 1rem;background:var(--surf2);border:1px solid var(--border);border-radius:11px;}
-.sb-author-name{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--text);}
-.sb-author-detail{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--muted2);line-height:1.75;margin-top:.3rem;}
-.sb-privacy{margin:.4rem .5rem .9rem;padding:.5rem 1rem;background:rgba(45,212,191,.05);border:1px solid rgba(45,212,191,.22);border-radius:9px;display:flex;align-items:flex-start;gap:.55rem;}
-.sb-privacy-icon{font-size:.95rem;margin-top:.05rem;}
-.sb-privacy-text{font-family:'JetBrains Mono',monospace;font-size:.57rem;color:var(--teal);letter-spacing:.04em;line-height:1.65;}
-h1,h2,h3{font-family:'Syne',sans-serif!important;}
-footer{display:none!important;}#MainMenu{display:none!important;}
-</style>""", unsafe_allow_html=True)
-
-import sys as _sys, os as _os
-_sys.path.insert(0, _os.path.dirname(_os.path.dirname(__file__)))
-from utils import ACCENT  # noqa — triggers path setup only
-
-def _svg(d, c, s=16):
-    return f'<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="{d}" stroke="{c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-
-_ICONS = {
-    "overview": "M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z",
-    "trends":   "M3 17l4-8 4 4 4-6 4 4 3-6",
-    "eda":      "M9 3h6m-3 0v7m-5 4l-2 7h14l-2-7M9 10h6",
-    "ml":       "M12 2a4 4 0 014 4v1h1a2 2 0 010 4h-1v1a4 4 0 01-4 4H8a4 4 0 01-4-4v-1H3a2 2 0 010-4h1V6a4 4 0 014-4h4zM9 9h.01M15 9h.01M9 13h6",
-    "vehicles": "M5 17H3v-5l2-5h14l2 5v5h-2m-1 0H7m0 0a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4z",
-    "routes":   "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z",
-    "deploy":   "M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z",
-}
-_IC_BG = {
-    "overview": ("rgba(45,212,191,.15)",  "#2DD4BF"),
-    "trends":   ("rgba(56,189,248,.15)",  "#38BDF8"),
-    "eda":      ("rgba(167,139,250,.15)", "#A78BFA"),
-    "ml":       ("rgba(252,211,77,.15)",  "#FCD34D"),
-    "vehicles": ("rgba(244,114,182,.15)", "#F472B6"),
-    "routes":   ("rgba(52,211,153,.15)",  "#34D399"),
-    "deploy":   ("rgba(248,113,113,.15)", "#F87171"),
-}
-def _nav(key, label, badge):
-    bg, clr = _IC_BG[key]
-    return (f'<div class="sb-nav-item">'
-            f'<div class="sb-nav-icon" style="background:{bg}">{_svg(_ICONS[key],clr)}</div>'
-            f'<span class="sb-nav-text">{label}</span>'
-            f'<span class="sb-nav-badge">{badge}</span>'
-            f'</div>')
-
-with st.sidebar:
-    st.markdown('''<div class="sb-brand"><div class="sb-logo">⛽</div>
-    <div class="sb-brand-title">Fleet Fuel<br>Intelligence</div>
-    <div class="sb-brand-sub">MSc · Strathmore University</div></div>''', unsafe_allow_html=True)
-    st.markdown('<div class="sb-section-label">Pages</div>', unsafe_allow_html=True)
-    _pages = [("overview","Overview & KPIs","KPIs"),("trends","Trends","Time"),
-               ("eda","EDA Figures","NB1"),("ml","ML Models","R²=0.9212"),
-               ("vehicles","Vehicles","VEH-xxx"),("routes","Routes","Analysis"),
-               ("deploy","Deployment","Savings")]
-    for _k, _l, _b in _pages:
-        st.markdown(_nav(_k, _l, _b), unsafe_allow_html=True)
-    st.markdown('''<div class="sb-section-label" style="margin-top:.5rem">Researcher</div>
-    <div class="sb-author"><div class="sb-author-name">Anette Kerubo Joseph</div>
-    <div class="sb-author-detail">Reg No: 151384<br>MSc Data Science &amp; Analytics<br>Strathmore University</div></div>
-    <div class="sb-privacy"><span class="sb-privacy-icon">🔒</span>
-    <div class="sb-privacy-text">Plates → VEH-xxx codes<br>Drivers → DRV-xxxx codes<br>PII stored separately</div></div>''',
-    unsafe_allow_html=True)
-
-
-
-
-
-st.title("🗺 Route Analysis")
-st.caption("Route efficiency scores — min 5 Full Tank trips per route/type combination")
+inject_css()
+sidebar_brand()
 
 df, df_full, df_eff = load_data()
 ra = get_route_scores(df_eff)
 
-types_u = sorted(ra["Type"].dropna().unique().tolist())
-sel = st.multiselect("Vehicle Type", types_u, default=types_u)
-rf = ra[ra["Type"].isin(sel)] if sel else ra
+st.markdown("""
+<div class="ui-card" style="background:linear-gradient(135deg,rgba(195,247,58,.06),rgba(0,229,255,.04));margin-bottom:22px">
+  <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;color:#F0EDFF">🗺 Routes</div>
+  <div style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(240,237,255,.3);margin-top:4px">
+    Route-level efficiency scoring · Optimisation matrix · Min 5 trips per route
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
-with col1:
-    top15 = rf.nlargest(15, "Score")
-    fig = go.Figure(go.Bar(
-        x=top15["Score"], y=top15["Route"],
-        orientation="h",
-        marker_color=[hex_alpha(TYPE_COLORS.get(t,BLUE),0.75) for t in top15["Type"]],
-        marker_line_color=[TYPE_COLORS.get(t,BLUE) for t in top15["Type"]],
-        marker_line_width=1.5,
-        text=[f"{s:.1f}" for s in top15["Score"]], textposition="outside",
-    ))
-    apply_layout(fig, "Top 15 Routes by Efficiency Score", 460)
-    fig.update_layout(showlegend=False, yaxis=dict(autorange="reversed"))
-    st.plotly_chart(fig, width="stretch")
+# ── KPIs ──────────────────────────────────────────────────────────────────────
+c1, c2, c3, c4 = st.columns(4)
+kpis = [
+    (c1, "Routes Analysed",   str(ra["Route"].nunique()),           "Min 5 trips",           "cyan"),
+    (c2, "Best Avg Eff.",     f"{ra['Avg_Eff'].max():.2f} km/L",   "Top route",              "lime"),
+    (c3, "Worst Avg Eff.",    f"{ra['Avg_Eff'].min():.2f} km/L",   "Lowest route",           "coral"),
+    (c4, "Avg Route Score",   f"{ra['Score'].mean():.1f}",          "0–100 composite",        "violet"),
+]
+for col, label, val, sub, color in kpis:
+    col.markdown(f"""
+<div class="kpi-pill kpi-{color}">
+  <div class="kpi-label">{label}</div>
+  <div class="kpi-value" style="color:var(--{color})">{val}</div>
+  <div class="kpi-sub">{sub}</div>
+</div>""", unsafe_allow_html=True)
 
-with col2:
-    fig2 = go.Figure(go.Scatter(
-        x=rf["Trips"], y=rf["Avg_Eff"],
+st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+# ── Filters ───────────────────────────────────────────────────────────────────
+c1, c2 = st.columns([2,1])
+with c1:
+    search = st.text_input("Search route", placeholder="Route name or code")
+with c2:
+    type_opts = ["All"] + sorted(ra["Type"].dropna().unique().tolist())
+    sel_type  = st.selectbox("Vehicle Type", type_opts)
+
+filtered = ra.copy()
+if sel_type != "All": filtered = filtered[filtered["Type"] == sel_type]
+if search:            filtered = filtered[filtered["Route"].str.contains(search, case=False, na=False)]
+
+# ── Scatter: Avg Eff vs Consistency ──────────────────────────────────────────
+sec_header("Efficiency vs Consistency Matrix", "Bubble = trip count")
+
+fig = go.Figure()
+types = filtered["Type"].dropna().unique()
+type_colors = {"Bus":"#FF6B6B","Shuttle":"#74B9FF","Eph":"#FFD166","Admin":"#B69CFF"}
+
+for t in types:
+    sub = filtered[filtered["Type"] == t]
+    fig.add_trace(go.Scatter(
+        x=sub["Avg_Eff"],
+        y=sub["Std_Eff"].fillna(0),
         mode="markers",
+        name=t,
         marker=dict(
-            color=[TYPE_COLORS.get(t,BLUE) for t in rf["Type"]],
-            size=rf["Score"]/6+4, opacity=0.75,
-            line=dict(color="rgba(255,255,255,0.3)", width=0.5)
+            size=sub["Trips"].clip(5, 50).apply(lambda x: x**0.5 * 4),
+            color=type_colors.get(t, "#B69CFF"),
+            opacity=0.75,
+            line=dict(color="#0F0B1E", width=1),
         ),
-        text=rf["Route"],
-        hovertemplate="%{text}<br>Trips: %{x}<br>Avg Eff: %{y:.3f}<extra></extra>",
+        text=sub["Route"],
+        hovertemplate="<b>%{text}</b><br>Avg: %{x:.2f} km/L<br>Std: %{y:.2f}<extra></extra>",
     ))
-    apply_layout(fig2, "Route Trips vs Efficiency (bubble = Score)", 460)
-    fig2.update_layout(xaxis_title="Number of Trips", yaxis_title="Avg Efficiency (km/L)")
-    st.plotly_chart(fig2, width="stretch")
 
-# Type breakdown
-fig3 = go.Figure()
-for vtype in types_u:
-    sub = rf[rf["Type"]==vtype]
-    if len(sub):
-        fig3.add_trace(go.Box(
-            y=sub["Avg_Eff"], name=vtype,
-            marker_color=TYPE_COLORS.get(vtype,BLUE),
-            line_color=TYPE_COLORS.get(vtype,BLUE),
-            fillcolor=hex_alpha(TYPE_COLORS.get(vtype,BLUE),0.27),
-            boxmean=True,
-        ))
-apply_layout(fig3, "Route Efficiency Distribution by Vehicle Type", 300)
-st.plotly_chart(fig3, width="stretch")
+apply_plotly(fig, "Route Optimisation Matrix (Avg Efficiency vs Variability)", height=380)
+fig.update_xaxes(title="Avg Efficiency (km/L)")
+fig.update_yaxes(title="Std Dev (km/L) — lower is more consistent")
+# Target quadrant annotation
+if not filtered.empty:
+    med_eff = filtered["Avg_Eff"].median()
+    med_std = filtered["Std_Eff"].fillna(0).median()
+    fig.add_shape(type="rect",
+        x0=med_eff, x1=filtered["Avg_Eff"].max()*1.05,
+        y0=0, y1=med_std,
+        line=dict(color="rgba(195,247,58,.3)", width=1, dash="dot"),
+        fillcolor="rgba(195,247,58,.04)",
+    )
+    fig.add_annotation(
+        x=filtered["Avg_Eff"].max()*0.98, y=med_std*0.2,
+        text="✦ Target zone", font=dict(color="#C3F73A", size=10, family="Space Mono"),
+        showarrow=False,
+    )
+st.plotly_chart(fig, use_container_width=True)
 
-st.dataframe(display_df(rf.sort_values("Score",ascending=False).reset_index(drop=True)),
-             use_container_width=True)
+# ── Top / Bottom routes ───────────────────────────────────────────────────────
+sec_header("Route Rankings", "By composite efficiency score")
+
+left, right = st.columns(2)
+with left:
+    st.markdown("""<div style="font-family:'Space Mono',monospace;font-size:9px;
+      letter-spacing:.1em;text-transform:uppercase;color:#C3F73A;margin-bottom:8px">
+      ▲ Top 10 Routes</div>""", unsafe_allow_html=True)
+    top = filtered.nlargest(10, "Score")[["Route","Type","Trips","Avg_Eff","Std_Eff","Score"]]
+    st.dataframe(display_df(top), use_container_width=True, height=340)
+
+with right:
+    st.markdown("""<div style="font-family:'Space Mono',monospace;font-size:9px;
+      letter-spacing:.1em;text-transform:uppercase;color:#FF6B6B;margin-bottom:8px">
+      ▼ Bottom 10 Routes</div>""", unsafe_allow_html=True)
+    bot = filtered.nsmallest(10, "Score")[["Route","Type","Trips","Avg_Eff","Std_Eff","Score"]]
+    st.dataframe(display_df(bot), use_container_width=True, height=340)
+
+# ── Full table ─────────────────────────────────────────────────────────────────
+sec_header("All Routes", f"{len(filtered)} routes shown")
+st.dataframe(
+    display_df(filtered.sort_values("Score", ascending=False)),
+    use_container_width=True, height=400,
+)
+
+insight("""
+Routes in the <strong style="color:#C3F73A">target zone</strong> (high efficiency + low variability)
+represent best-practice operating conditions. Vehicles on low-scoring routes should be audited
+for driver behaviour, route terrain, and fuel station proximity. Consistency (low Std Dev) is
+weighted at 40% in the composite score.
+""")
