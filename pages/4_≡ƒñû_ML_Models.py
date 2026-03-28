@@ -5,7 +5,7 @@ import streamlit as st
 import plotly.graph_objects as go
 import numpy as np
 
-st.set_page_config(page_title="ML Models | Fleet Fuel", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="ML Models | Fleet Fuel", page_icon="⚙️", layout="wide")
 
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))

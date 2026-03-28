@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import os, glob
 
-st.set_page_config(page_title="EDA | Fleet Fuel", page_icon="🔬", layout="wide")
+st.set_page_config(page_title="EDA | Fleet Fuel", page_icon="�", layout="wide")
 
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
