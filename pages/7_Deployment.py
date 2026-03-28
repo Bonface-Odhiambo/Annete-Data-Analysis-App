@@ -84,7 +84,7 @@ colors   = ["#FF6B6B","#74B9FF","#FFD166","#B69CFF"]
 fig = go.Figure()
 fig.add_trace(go.Bar(
     name="Actual Avg (km/L)", x=types, y=actuals,
-    marker_color=[c + "CC" for c in colors],
+    marker_color=["rgba(255,107,107,0.8)","rgba(116,185,255,0.8)","rgba(255,209,102,0.8)","rgba(182,156,255,0.8)"],
     marker_line_color="#0F0B1E", marker_line_width=2,
 ))
 fig.add_trace(go.Bar(
