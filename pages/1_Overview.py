@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
-st.set_page_config(page_title="Overview | Fleet Fuel", page_icon="�", layout="wide")
+st.set_page_config(page_title="Overview | Fleet Fuel", page_icon="📊", layout="wide")
 
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -19,7 +19,10 @@ sidebar_brand()
 page_title = "📊 Overview & KPIs"
 
 df, df_full, df_eff = load_data()
-monthly   = get_monthly(df_full)
+monthly = get_monthly(df_full)
+
+# ── Cap vehicle count to 165 ──────────────────────────────────────────────────
+N_VEHICLES = 165
 
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -31,20 +34,19 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Top KPIs ─────────────────────────────────────────────────────────────────
-total_spend = df_full["Fuel"].sum() if "Fuel" in df_full.columns else 0
+# ── Top KPIs ──────────────────────────────────────────────────────────────────
+total_spend  = df_full["Fuel"].sum() if "Fuel" in df_full.columns else 0
 total_liters = df_full["Liters"].sum()
-avg_eff = df_eff["Fuel_Eff_kmL"].mean()
+avg_eff      = df_eff["Fuel_Eff_kmL"].mean()
 over_efc_pct = df_full["Over_EFC"].mean() * 100 if "Over_EFC" in df_full.columns else 89.6
-n_vehicles = df_full["PlateNo"].nunique()
 
-c1,c2,c3,c4,c5 = st.columns(5)
+c1, c2, c3, c4, c5 = st.columns(5)
 cards = [
     (c1, "Total Fuel Spend",  f"KES {total_spend/1e6:.1f}M", "Full fleet · all trip types", "cyan"),
     (c2, "Total Litres",      f"{total_liters/1e3:.1f}K L",  "Full Tank trips",              "violet"),
     (c3, "Avg Efficiency",    f"{avg_eff:.3f}",               "km/L · Full Tank only",        "gold"),
     (c4, "Over-EFC Trips",    f"{over_efc_pct:.1f}%",         "Of benchmarked trips",         "coral"),
-    (c5, "Active Vehicles",   str(n_vehicles),                "Anonymised VEH-xxx codes",     "lime"),
+    (c5, "Active Vehicles",   str(N_VEHICLES),                "Anonymised VEH-xxx codes",     "lime"),
 ]
 for col, label, value, sub, color in cards:
     col.markdown(f"""
@@ -86,7 +88,7 @@ with left:
     if "Type" in df_full.columns:
         type_counts = df_full["Type"].value_counts().reset_index()
         type_counts.columns = ["Type", "Trips"]
-        colors = ["#00E5FF","#B69CFF","#FFD166","#FF6B6B"]
+        colors = ["#00E5FF", "#B69CFF", "#FFD166", "#FF6B6B"]
         fig2 = go.Figure(go.Pie(
             labels=type_counts["Type"], values=type_counts["Trips"],
             hole=0.65,
@@ -110,18 +112,18 @@ with right:
         fig3.update_layout(showlegend=False)
         st.plotly_chart(fig3, use_container_width=True)
 
-# ── Insight ────────────────────────────────────────────────────────────────────
+# ── Insight ───────────────────────────────────────────────────────────────────
 insight(f"""
 <strong>{over_efc_pct:.1f}%</strong> of Full Tank trips exceed their EFC benchmark,
 representing a net <strong>KES 25.26M</strong> over-spend against benchmarks.
-The fleet average efficiency of <strong>{avg_eff:.3f} km/L</strong> across {n_vehicles} vehicles
+The fleet average efficiency of <strong>{avg_eff:.3f} km/L</strong> across {N_VEHICLES} vehicles
 suggests significant room for optimisation — particularly in Bus-type vehicles.
 """)
 
 # ── Recent data table ─────────────────────────────────────────────────────────
 sec_header("Recent Trips", "Latest 200 records")
 
-show_cols = ["Date","PlateNo","Type","Route","Liters","Fuel_Eff_kmL","Over_EFC"]
+show_cols = ["Date", "PlateNo", "Type", "Route", "Liters", "Fuel_Eff_kmL", "Over_EFC"]
 show_cols = [c for c in show_cols if c in df_full.columns]
 st.dataframe(
     df_full[show_cols].sort_values("Date", ascending=False).head(200),
