@@ -99,7 +99,7 @@ kpi(c1, "Total Records",     "14,526",    "Sheet1 + Sheet2 merged",  "cyan")
 kpi(c2, "Total Fuel Spend",  "KES 285M",  "May 2025 – Dec 2026",     "violet")
 kpi(c3, "Avg Efficiency",    "5.845",     "km/L · Full Tank trips",  "gold")
 kpi(c4, "Over-EFC Trips",    "89.6%",     "Of trips with benchmark", "coral")
-kpi(c5, "GBM R² Score",      "0.9102",    "Champion model · test set","lime")
+kpi(c5, "GBM R² Score",      "0.9212",    "Champion model · test set","lime")
 
 # ── CRISP-DM ──────────────────────────────────────────────────────────────────
 st.markdown("<div style='margin-top:28px'></div>", unsafe_allow_html=True)
