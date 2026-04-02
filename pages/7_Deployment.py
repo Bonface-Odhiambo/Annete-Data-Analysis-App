@@ -155,7 +155,7 @@ sec_header("Research Objective Summary", "CRISP-DM outcomes")
 
 ros = [
     ("RO1", "Predict fuel consumption",
-     "Gradient Boosting Regressor", "R² = 0.9904", "NB2 §9", "Modelling"),
+     "Gradient Boosting Regressor", "R² = 0.9202", "NB2 §9", "Modelling"),
     ("RO2", "Identify inefficient vehicles",
      "Within-type scoring + Grade A–D", "89.6% over-EFC", "NB3 §4", "Evaluation"),
     ("RO3", "Quantify recoverable savings",
