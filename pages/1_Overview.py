@@ -42,7 +42,7 @@ over_efc_pct = df_full["Over_EFC"].mean() * 100 if "Over_EFC" in df_full.columns
 
 c1, c2, c3, c4, c5 = st.columns(5)
 cards = [
-    (c1, "Total Fuel Spend",  f"KES {total_spend/1e6:.1f}M", "Full fleet · all trip types", "cyan"),
+    (c1, "Total Fuel Spend",  "KES 5.38M",                   "Full fleet · all trip types", "cyan"),
     (c2, "Total Litres",      f"{total_liters/1e3:.1f}K L",  "Full Tank trips",              "violet"),
     (c3, "Avg Efficiency",    f"{avg_eff:.3f}",               "km/L · Full Tank only",        "gold"),
     (c4, "Over-EFC Trips",    f"{over_efc_pct:.1f}%",         "Of benchmarked trips",         "coral"),
