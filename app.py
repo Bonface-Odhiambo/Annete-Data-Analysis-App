@@ -46,7 +46,7 @@ st.markdown("""
 
   <p style="font-size:15px;color:rgba(240,237,255,.45);line-height:1.7;max-width:640px;margin-bottom:26px">
     Predictive modelling for fuel efficiency and fleet optimisation in public transport —
-    combining <strong style="color:#F0EDFF">14,526 anonymised trip records</strong> across 178 vehicles
+    combining <strong style="color:#F0EDFF">14,526 anonymised trip records</strong> across 165 vehicles
     with machine learning to surface KES 285M+ in fleet spend patterns and
     <strong style="color:#C3F73A">KES 5.38M</strong> in annual recoverable savings.
   </p>
