@@ -48,7 +48,7 @@ st.markdown("""
     Predictive modelling for fuel efficiency and fleet optimisation in public transport —
     combining <strong style="color:#F0EDFF">14,526 anonymised trip records</strong> across 178 vehicles
     with machine learning to surface KES 285M+ in fleet spend patterns and
-    <strong style="color:#C3F73A">KES 8.03M</strong> in annual recoverable savings.
+    <strong style="color:#C3F73A">KES 5.38M</strong> in annual recoverable savings.
   </p>
 
   <div style="display:flex;flex-wrap:wrap;gap:8px">
@@ -97,9 +97,9 @@ def kpi(col, label, value, sub, color):
 
 kpi(c1, "Total Records",     "14,526",    "Sheet1 + Sheet2 merged",  "cyan")
 kpi(c2, "Total Fuel Spend",  "KES 285M",  "May 2025 – Dec 2026",     "violet")
-kpi(c3, "Avg Efficiency",    "5.842",     "km/L · Full Tank trips",  "gold")
+kpi(c3, "Avg Efficiency",    "5.38",     "km/L · Full Tank trips",  "gold")
 kpi(c4, "Over-EFC Trips",    "89.6%",     "Of trips with benchmark", "coral")
-kpi(c5, "GBM R² Score",      "0.9904",    "Champion model · test set","lime")
+kpi(c5, "GBM R² Score",      "0.9202",    "Champion model · test set","lime")
 
 # ── CRISP-DM ──────────────────────────────────────────────────────────────────
 st.markdown("<div style='margin-top:28px'></div>", unsafe_allow_html=True)
@@ -166,16 +166,16 @@ st.markdown("""
   <span style="font-size:36px;flex-shrink:0">💰</span>
   <div style="flex:1">
     <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;
-      color:#F0EDFF;margin-bottom:4px">KES 8.03M Annual Recoverable Savings</div>
+      color:#F0EDFF;margin-bottom:4px">KES 5.38M Annual Recoverable Savings</div>
     <div style="font-size:13px;color:rgba(240,237,255,.45);line-height:1.55">
       If underperforming vehicles reach the within-type Q3 efficiency target, the fleet can recover
-      KES 8.03M/year. Current over-EFC spend totals <strong style="color:#F0EDFF">KES 25.26M</strong>
+      KES 5.38M/year. Current over-EFC spend totals <strong style="color:#F0EDFF">KES 25.26M</strong>
       — with 89.6% of Full Tank trips exceeding benchmarks.
     </div>
   </div>
   <div style="text-align:right;flex-shrink:0">
     <div style="font-family:'Outfit',sans-serif;font-size:34px;font-weight:900;
-      color:#C3F73A;letter-spacing:-.04em">KES 8.03M</div>
+      color:#C3F73A;letter-spacing:-.04em">KES 5.38M</div>
     <div style="font-family:'Space Mono',monospace;font-size:9px;
       color:rgba(240,237,255,.22);margin-top:2px">/ year recoverable</div>
   </div>
